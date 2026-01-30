@@ -1,31 +1,34 @@
-import { StyleSheet } from 'react-native';
+import {Text, TouchableOpacity, View} from 'react-native';
+import {Screen} from '@/components/layout/Screen';
+import {EventList} from '@/components/events/EventList';
+import {mockEvents} from '@/mock/data';
+import {useState} from 'react';
 
-import EditScreenInfo from '@/components/EditScreenInfo';
-import { Text, View } from '@/components/Themed';
+export default function FeedScreen() {
+    const [events] = useState(mockEvents);
 
-export default function TabOneScreen() {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Salut Thomas</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/(tabs)/index.tsx" />
-    </View>
-  );
+    return (
+        <Screen scrollable={false} className="flex-1">
+            <View className="flex-row items-center justify-between p-4 bg-white border-b border-gray-200">
+                <Text className="text-2xl font-bold">🎉 Événements</Text>
+                <TouchableOpacity
+                    className="bg-primary px-4 py-2 rounded-lg"
+                    onPress={() => {/* TODO: ouvrir modal création */
+                    }}
+                >
+                    <Text className="text-white font-semibold">+ Créer</Text>
+                </TouchableOpacity>
+            </View>
+
+            <View className="flex-1">
+                <EventList
+                    events={events}
+                    onEventPress={(event) => {
+                        console.log('Event clicked:', event.title);
+                        // TODO: naviguer vers détail événement
+                    }}
+                />
+            </View>
+        </Screen>
+    );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
-  },
-});
