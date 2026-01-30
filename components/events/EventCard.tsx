@@ -1,20 +1,6 @@
 import { View, Text, Image, TouchableOpacity } from 'react-native';
 import { Card } from '../ui/Card';
-
-type Event = {
-    id: string;
-    title: string;
-    description: string;
-    image_url: string;
-    event_date: string;
-    location: string;
-    max_participants: number;
-};
-
-type EventCardProps = {
-    event: Event;
-    onPress?: () => void;
-};
+import type { EventCardProps } from '@/types';
 
 export function EventCard({ event, onPress }: Readonly<EventCardProps>) {
     return (

@@ -1,17 +1,6 @@
 import { View, Text, TouchableOpacity } from 'react-native';
 import { Card } from '../ui/Card';
-
-type Group = {
-    id: string;
-    name: string;
-    description: string;
-    member_count: number;
-};
-
-type GroupCardProps = {
-    group: Group;
-    onPress?: () => void;
-};
+import type { GroupCardProps } from '@/types';
 
 export function GroupCard({ group, onPress }: Readonly<GroupCardProps>) {
     return (

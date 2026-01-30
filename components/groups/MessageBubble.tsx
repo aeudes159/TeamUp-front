@@ -1,20 +1,7 @@
 import { View, Text, Image } from 'react-native';
+import type { MessageBubbleProps } from '@/types';
 
-type Message = {
-    id: string;
-    username: string;
-    avatar_url: string;
-    content: string;
-    created_at: string;
-    user_id: string;
-};
-
-type MessageBubbleProps = {
-    message: Message;
-    isCurrentUser?: boolean;
-};
-
-export function MessageBubble({ message, isCurrentUser = false }: Readonly<MessageBubbleProps>) {
+export function MessageBubble({ message, isCurrentUser }: Readonly<MessageBubbleProps>) {
     return (
         <View className={`flex-row mb-4 ${isCurrentUser ? 'justify-end' : 'justify-start'}`}>
             {!isCurrentUser && (

@@ -1,15 +1,6 @@
 import { FlatList, View, Text } from 'react-native';
 import { EventCard } from './EventCard';
-
-type Event = {
-    id: string;
-    title: string;
-    description: string;
-    image_url: string;
-    event_date: string;
-    location: string;
-    max_participants: number;
-};
+import type { Event } from '@/types';
 
 type EventListProps = {
     events: Event[];
