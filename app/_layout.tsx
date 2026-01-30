@@ -1,5 +1,5 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import {DefaultTheme, ThemeProvider} from '@react-navigation/native';
+import {DefaultTheme as NavigationTheme, ThemeProvider} from '@react-navigation/native';
 import {useFonts} from 'expo-font';
 import {Stack} from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -7,6 +7,8 @@ import {useEffect} from 'react';
 import 'react-native-reanimated';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from '@/lib/queryClient';
+import { PaperProvider } from 'react-native-paper';
+import { theme } from '@/lib/theme';
 
 export {
     // Catch any errors thrown by the Layout component.
@@ -46,15 +48,16 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
-    // Force le thème clair (blanc)
     return (
         <QueryClientProvider client={queryClient}>
-            <ThemeProvider value={DefaultTheme}>
-                <Stack>
-                    <Stack.Screen name="(tabs)" options={{headerShown: false}}/>
-                    <Stack.Screen name="modal" options={{presentation: 'modal'}}/>
-                </Stack>
-            </ThemeProvider>
+            <PaperProvider theme={theme}>
+                <ThemeProvider value={NavigationTheme}>
+                    <Stack>
+                        <Stack.Screen name="(tabs)" options={{headerShown: false}}/>
+                        <Stack.Screen name="modal" options={{presentation: 'modal'}}/>
+                    </Stack>
+                </ThemeProvider>
+            </PaperProvider>
         </QueryClientProvider>
     );
 }

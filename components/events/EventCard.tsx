@@ -1,41 +1,88 @@
-import { View, Text, Image, TouchableOpacity } from 'react-native';
-import { Card } from '../ui/Card';
-import type { EventCardProps } from '@/types';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import { Image } from 'expo-image';
+import { Card, Text, Chip, Button as PaperButton } from 'react-native-paper';
+import { Calendar, MapPin, Users } from 'lucide-react-native';
+import type { Event, EventCardProps } from '@/types';
 
-export function EventCard({ event, onPress }: Readonly<EventCardProps>) {
+export function EventCard({
+    event,
+    onPress,
+}: Readonly<EventCardProps>) {
     return (
-        <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
-            <Card className="mb-4">
-                <Image
-                    source={{ uri: event.image_url }}
-                    className="w-full h-48 rounded-lg mb-3"
-                    resizeMode="cover"
-                />
+        <Card style={styles.card} onPress={onPress}>
+            <Card.Cover source={{ uri: event.image_url }} style={styles.cover} />
+            
+            <Card.Content style={styles.content}>
+                <View style={styles.header}>
+                    <Text variant="titleLarge" style={styles.title}>{event.title}</Text>
+                    <Chip icon={() => <Users size={16} />} style={styles.chip}>
+                        {event.max_participants}
+                    </Chip>
+                </View>
 
-                <Text className="text-xl font-bold mb-2" >{event.title}</Text>
-
-                <Text className="text-gray-600 mb-3" numberOfLines={2}>
+                <Text variant="bodyMedium" numberOfLines={2} style={styles.description}>
                     {event.description}
                 </Text>
 
-                <View className="flex-row items-center mb-2">
-                    <Text className="text-sm text-gray-500 mr-4">📍 {event.location}</Text>
+                <View style={styles.infoRow}>
+                    <Calendar size={16} color="#6366f1" />
+                    <Text variant="bodySmall" style={styles.infoText}>
+                        {new Date(event.event_date).toLocaleDateString('fr-FR', {
+                            day: 'numeric',
+                            month: 'long',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        })}
+                    </Text>
                 </View>
 
-                <View className="flex-row items-center justify-between">
-                    <Text className="text-sm text-gray-500">
-                        📅 {new Date(event.event_date).toLocaleDateString('fr-FR', {
-                        day: 'numeric',
-                        month: 'long',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    })}
-                    </Text>
-                    <Text className="text-sm text-primary font-semibold">
-                        👥 {event.max_participants} places
+                <View style={styles.infoRow}>
+                    <MapPin size={16} color="#6b7280" />
+                    <Text variant="bodySmall" style={styles.infoText} numberOfLines={1}>
+                        {event.location}
                     </Text>
                 </View>
-            </Card>
-        </TouchableOpacity>
+            </Card.Content>
+        </Card>
     );
 }
+
+const styles = StyleSheet.create({
+    card: {
+        marginBottom: 16,
+        borderRadius: 12,
+    },
+    cover: {
+        height: 200,
+    },
+    content: {
+        paddingTop: 16,
+    },
+    header: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
+        marginBottom: 8,
+    },
+    title: {
+        flex: 1,
+        fontWeight: 'bold',
+    },
+    chip: {
+        marginLeft: 8,
+    },
+    description: {
+        marginBottom: 12,
+        color: '#6b7280',
+    },
+    infoRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+        marginBottom: 8,
+    },
+    infoText: {
+        flex: 1,
+        color: '#6b7280',
+    },
+});

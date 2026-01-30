@@ -1,32 +1,40 @@
-import { View, Text, Image } from 'react-native';
+import { View, StyleSheet, Image } from 'react-native';
+import { Surface, Text } from 'react-native-paper';
 import type { MessageBubbleProps } from '@/types';
+import { useTheme } from 'react-native-paper';
 
 export function MessageBubble({ message, isCurrentUser }: Readonly<MessageBubbleProps>) {
+    const theme = useTheme();
+    
     return (
-        <View className={`flex-row mb-4 ${isCurrentUser ? 'justify-end' : 'justify-start'}`}>
+        <View style={[styles.container, isCurrentUser ? styles.containerEnd : styles.containerStart]}>
             {!isCurrentUser && (
                 <Image
                     source={{ uri: message.avatar_url }}
-                    className="w-8 h-8 rounded-full mr-2"
+                    style={styles.avatar}
                 />
             )}
 
-            <View className={`max-w-[75%] ${isCurrentUser ? 'items-end' : 'items-start'}`}>
+            <View style={[styles.messageContainer, isCurrentUser ? styles.messageEnd : styles.messageStart]}>
                 {!isCurrentUser && (
-                    <Text className="text-xs text-gray-500 mb-1 ml-2">{message.username}</Text>
+                    <Text variant="labelSmall" style={styles.username}>{message.username}</Text>
                 )}
 
-                <View className={`rounded-2xl px-4 py-3 ${
-                    isCurrentUser
-                        ? 'bg-primary'
-                        : 'bg-gray-200'
-                }`}>
-                    <Text className={isCurrentUser ? 'text-white' : 'text-gray-800'}>
+                <Surface 
+                    style={[
+                        styles.bubble,
+                        isCurrentUser 
+                            ? { backgroundColor: theme.colors.primary }
+                            : { backgroundColor: theme.colors.surfaceVariant }
+                    ]}
+                    elevation={1}
+                >
+                    <Text style={isCurrentUser ? styles.textWhite : styles.textDark}>
                         {message.content}
                     </Text>
-                </View>
+                </Surface>
 
-                <Text className="text-xs text-gray-400 mt-1 mx-2">
+                <Text variant="labelSmall" style={styles.timestamp}>
                     {new Date(message.created_at).toLocaleTimeString('fr-FR', {
                         hour: '2-digit',
                         minute: '2-digit'
@@ -37,9 +45,58 @@ export function MessageBubble({ message, isCurrentUser }: Readonly<MessageBubble
             {isCurrentUser && (
                 <Image
                     source={{ uri: message.avatar_url }}
-                    className="w-8 h-8 rounded-full ml-2"
+                    style={styles.avatar}
                 />
             )}
         </View>
     );
 }
+
+const styles = StyleSheet.create({
+    container: {
+        flexDirection: 'row',
+        marginBottom: 16,
+    },
+    containerStart: {
+        justifyContent: 'flex-start',
+    },
+    containerEnd: {
+        justifyContent: 'flex-end',
+    },
+    avatar: {
+        width: 32,
+        height: 32,
+        borderRadius: 16,
+        marginHorizontal: 8,
+    },
+    messageContainer: {
+        maxWidth: '75%',
+    },
+    messageStart: {
+        alignItems: 'flex-start',
+    },
+    messageEnd: {
+        alignItems: 'flex-end',
+    },
+    username: {
+        marginBottom: 4,
+        marginLeft: 8,
+        color: '#6b7280',
+    },
+    bubble: {
+        borderRadius: 16,
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+    },
+    textWhite: {
+        color: '#ffffff',
+    },
+    textDark: {
+        color: '#1f2937',
+    },
+    timestamp: {
+        marginTop: 4,
+        marginHorizontal: 8,
+        color: '#9ca3af',
+    },
+});

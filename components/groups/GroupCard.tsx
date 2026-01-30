@@ -1,23 +1,43 @@
-import { View, Text, TouchableOpacity } from 'react-native';
-import { Card } from '../ui/Card';
+import { View, StyleSheet } from 'react-native';
+import { Card, Text, Chip } from 'react-native-paper';
 import type { GroupCardProps } from '@/types';
 
 export function GroupCard({ group, onPress }: Readonly<GroupCardProps>) {
     return (
-        <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
-            <Card className="mb-3">
-                <View className="flex-row items-center justify-between">
-                    <View className="flex-1">
-                        <Text className="text-lg font-bold mb-1">{group.name}</Text>
-                        <Text className="text-gray-600 text-sm">{group.description}</Text>
+        <Card style={styles.card} onPress={onPress}>
+            <Card.Content>
+                <View style={styles.container}>
+                    <View style={styles.textContainer}>
+                        <Text variant="titleMedium" style={styles.name}>{group.name}</Text>
+                        <Text variant="bodySmall" style={styles.description}>{group.description}</Text>
                     </View>
-                    <View className="bg-primary/10 px-3 py-1 rounded-full">
-                        <Text className="text-primary font-semibold">
-                            {group.member_count} 👥
-                        </Text>
-                    </View>
+                    <Chip icon="account-group">
+                        {group.member_count}
+                    </Chip>
                 </View>
-            </Card>
-        </TouchableOpacity>
+            </Card.Content>
+        </Card>
     );
 }
+
+const styles = StyleSheet.create({
+    card: {
+        marginBottom: 12,
+    },
+    container: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+    textContainer: {
+        flex: 1,
+        marginRight: 12,
+    },
+    name: {
+        fontWeight: 'bold',
+        marginBottom: 4,
+    },
+    description: {
+        color: '#6b7280',
+    },
+});

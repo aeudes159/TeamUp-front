@@ -1,17 +1,18 @@
-import { View, Text, FlatList } from 'react-native';
+import { View, FlatList, StyleSheet } from 'react-native';
 import { Screen } from '@/components/layout/Screen';
 import { GroupCard } from '@/components/groups/GroupCard';
 import { mockGroups } from '@/mock/data';
 import { router } from 'expo-router';
+import { Appbar } from 'react-native-paper';
 
 export default function GroupsScreen() {
     return (
-        <Screen scrollable={false} className="flex-1">
-            <View className="p-4 bg-white border-b border-gray-200">
-                <Text className="text-2xl font-bold">👥 Mes Groupes</Text>
-            </View>
+        <Screen scrollable={false}>
+            <Appbar.Header>
+                <Appbar.Content title="👥 Mes Groupes" />
+            </Appbar.Header>
 
-            <View className="flex-1">
+            <View style={styles.container}>
                 <FlatList
                     data={mockGroups}
                     keyExtractor={(item) => item.id}
@@ -21,9 +22,20 @@ export default function GroupsScreen() {
                             onPress={() => router.push(`/group/${item.id}`)}
                         />
                     )}
-                    contentContainerStyle={{ flexGrow: 1 }}
+                    contentContainerStyle={styles.listContent}
                 />
             </View>
         </Screen>
     );
 }
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        paddingHorizontal: 16,
+        paddingTop: 16,
+    },
+    listContent: {
+        flexGrow: 1,
+    },
+});

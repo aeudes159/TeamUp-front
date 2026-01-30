@@ -1,15 +1,29 @@
-import { View } from 'react-native';
 import { ReactNode } from 'react';
+import { Card as PaperCard } from 'react-native-paper';
+import { StyleProp, ViewStyle } from 'react-native';
 
 type CardProps = {
     children: ReactNode;
-    className?: string;
+    style?: StyleProp<ViewStyle>;
+    onPress?: () => void;
 };
 
-export function Card({ children, className = '' }: Readonly<CardProps>) {
+export function Card({ children, style, onPress }: Readonly<CardProps>) {
+    if (onPress) {
+        return (
+            <PaperCard style={style} onPress={onPress}>
+                <PaperCard.Content>
+                    {children}
+                </PaperCard.Content>
+            </PaperCard>
+        );
+    }
+
     return (
-        <View className={`bg-white rounded-xl shadow-sm p-4 ${className}`}>
-            {children}
-        </View>
+        <PaperCard style={style}>
+            <PaperCard.Content>
+                {children}
+            </PaperCard.Content>
+        </PaperCard>
     );
 }

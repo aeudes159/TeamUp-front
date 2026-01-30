@@ -1,5 +1,6 @@
-import {ActivityIndicator, Text, TouchableOpacity} from 'react-native';
-import {ReactNode} from 'react';
+import { ReactNode } from 'react';
+import { Button as PaperButton } from 'react-native-paper';
+import { StyleProp, ViewStyle } from 'react-native';
 
 type ButtonProps = {
     onPress: () => void;
@@ -8,49 +9,37 @@ type ButtonProps = {
     size?: 'sm' | 'md' | 'lg';
     loading?: boolean;
     disabled?: boolean;
+    style?: StyleProp<ViewStyle>;
 };
 
 export function Button({
-                           onPress,
-                           children,
-                           variant = 'primary',
-                           size = 'md',
-                           loading = false,
-                           disabled = false
-                       }: Readonly<ButtonProps>) {
-    const baseClasses = 'rounded-lg items-center justify-center flex-row';
+    onPress,
+    children,
+    variant = 'primary',
+    size = 'md',
+    loading = false,
+    disabled = false,
+    style,
+}: Readonly<ButtonProps>) {
+    const mode = variant === 'outline' ? 'outlined' : 'contained';
+    
+    const buttonColor = variant === 'secondary' ? 'secondary' : undefined;
 
-    const variantClasses = {
-        primary: 'bg-primary',
-        secondary: 'bg-secondary',
-        outline: 'border-2 border-primary bg-transparent'
-    };
-
-    const sizeClasses = {
-        sm: 'px-3 py-2',
-        md: 'px-4 py-3',
-        lg: 'px-6 py-4'
-    };
-
-    const textClasses = {
-        primary: 'text-white font-semibold',
-        secondary: 'text-white font-semibold',
-        outline: 'text-primary font-semibold'
+    const contentStyle = {
+        paddingVertical: size === 'sm' ? 4 : size === 'lg' ? 12 : 8,
     };
 
     return (
-        <TouchableOpacity
+        <PaperButton
+            mode={mode}
             onPress={onPress}
-            disabled={disabled || loading}
-            className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${
-                disabled ? 'opacity-50' : ''
-            }`}
+            loading={loading}
+            disabled={disabled}
+            buttonColor={buttonColor}
+            contentStyle={contentStyle}
+            style={style}
         >
-            {loading ? (
-                <ActivityIndicator color={variant === 'outline' ? '#6366f1' : '#fff'}/>
-            ) : (
-                <Text className={textClasses[variant]}>{children}</Text>
-            )}
-        </TouchableOpacity>
+            {children}
+        </PaperButton>
     );
 }
