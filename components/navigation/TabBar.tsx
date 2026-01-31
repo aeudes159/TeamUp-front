@@ -116,7 +116,7 @@ const TabBar: React.FC<TabBarProps> = ({ state, descriptors, navigation }) => {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: themeColors.card }]}>
+    <View style={[styles.container, { backgroundColor: '#FFFFFF' }]}>
       <View style={styles.tabBar}>
         {state.routes.map((route: any, index: number) => {
           const { options } = descriptors[route.key];
@@ -145,34 +145,19 @@ const TabBar: React.FC<TabBarProps> = ({ state, descriptors, navigation }) => {
                 <Animated.View 
                   style={[
                     styles.iconContainer, 
-                    isFocused && styles.iconContainerFocused,
                     {
                       backgroundColor: isFocused ? Colors.light.accent + '25' : 'transparent',
                       transform: [{ scale: scaleAnimations[index] }],
                     }
                   ]}
                 >
-                  <FontAwesome
-                    name={getIconName(route.name)}
-                    size={24}
-                    color={iconColor}
-                    style={styles.icon}
-                  />
-                </Animated.View>
-                <Animated.Text 
-                  style={[
-                    styles.label, 
-                    { 
-                      color: textColor,
-                      opacity: scaleAnimations[index].interpolate({
-                        inputRange: [1, 1.1],
-                        outputRange: [0.7, 1],
-                      }),
-                    }
-                  ]}
-                >
-                  {getTabTitle(route.name)}
-                </Animated.Text>
+                   <FontAwesome
+                     name={getIconName(route.name)}
+                     size={32}
+                     color={iconColor}
+                     style={styles.icon}
+                   />
+                 </Animated.View>
                 {isFocused && (
                   <Animated.View 
                     style={[
@@ -199,64 +184,46 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    paddingBottom: 12,
-    paddingTop: 16,
+    paddingBottom: 6,
+    paddingTop: 8,
     borderTopWidth: 0,
+    borderTopLeftRadius: 18,
+    borderTopRightRadius: 18,
   },
   tabBar: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
     marginHorizontal: 16,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 40,
-    paddingVertical: 12,
+    paddingVertical: 6,
     paddingHorizontal: 20,
-    shadowColor: '#3A235A',
-    shadowOffset: { width: 0, height: -6 },
-    shadowOpacity: 0.18,
-    shadowRadius: 25,
-    elevation: 12,
-    borderWidth: 0,
   },
   tab: {
     flex: 1,
     alignItems: 'center',
-    paddingVertical: 6,
+    paddingVertical: 3,
   },
   tabContent: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 6,
+    paddingVertical: 2,
     paddingHorizontal: 12,
-    borderRadius: 24,
+    borderRadius: 26,
     position: 'relative',
   },
   iconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 52,
+    height: 52,
+    borderRadius: 26,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'transparent',
   },
-  iconContainerFocused: {
-    shadowColor: '#F08A5D',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
-    shadowRadius: 12,
-    elevation: 6,
-  },
+
   icon: {
     marginBottom: 3,
   },
-  label: {
-    fontSize: 11,
-    fontWeight: '600',
-    marginTop: 3,
-    textAlign: 'center',
-    letterSpacing: 0.2,
-  },
+
   indicator: {
     position: 'absolute',
     top: -4,
