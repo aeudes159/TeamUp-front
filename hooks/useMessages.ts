@@ -11,9 +11,9 @@ import type {
 
 /**
  * Polling interval for realtime-like message updates (in milliseconds)
- * Set to 3 seconds for a balance between responsiveness and API load
+ * Set to 2 seconds for better responsiveness in group chat
  */
-const MESSAGE_POLL_INTERVAL = 3000;
+const MESSAGE_POLL_INTERVAL = 2000;
 
 /**
  * Fetch messages for a discussion with polling for realtime updates

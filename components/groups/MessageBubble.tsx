@@ -1,27 +1,46 @@
-import { View, StyleSheet, Image } from 'react-native';
+import { View, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { Surface, Text } from 'react-native-paper';
 import type { MessageBubbleProps } from '@/types';
 import { useTheme } from 'react-native-paper';
+import { ReactionBar } from '@/components/chat/ReactionBar';
+import { ReactionPicker } from '@/components/chat/ReactionPicker';
+
+// TODO: Replace with actual authenticated user ID
+const CURRENT_USER_ID = 1;
+
+type ExtendedMessageBubbleProps = MessageBubbleProps & {
+    showPicker?: boolean;
+    onSelectEmoji?: (emoji: string) => void;
+    onClosePicker?: () => void;
+};
 
 /**
  * MessageBubble component for displaying chat messages
- * 
- * Note: The new API doesn't include avatar_url and username in the message.
- * These should be passed via the optional senderName and senderAvatar props,
- * or fetched separately using the senderId.
  */
-export function MessageBubble({ 
-    message, 
+export function MessageBubble({
+    message,
     isCurrentUser,
     senderName,
-    senderAvatar 
-}: Readonly<MessageBubbleProps>) {
+    senderAvatar,
+    onLongPress,
+    reactions = [],
+    onReactionPress,
+    showPicker = false,
+    onSelectEmoji,
+    onClosePicker,
+}: Readonly<ExtendedMessageBubbleProps>) {
     const theme = useTheme();
-    
+
     // Default avatar placeholder
     const avatarUrl = senderAvatar || `https://i.pravatar.cc/150?u=${message.senderId}`;
     const displayName = senderName || `User ${message.senderId}`;
-    
+
+    const handleReactionPress = (emoji: string, userReaction?: { id: number | null }) => {
+        if (onReactionPress) {
+            onReactionPress(emoji);
+        }
+    };
+
     return (
         <View style={[styles.container, isCurrentUser ? styles.containerEnd : styles.containerStart]}>
             {!isCurrentUser && (
@@ -36,28 +55,42 @@ export function MessageBubble({
                     <Text variant="labelSmall" style={styles.username}>{displayName}</Text>
                 )}
 
-                <Surface 
-                    style={[
-                        styles.bubble,
-                        isCurrentUser 
-                            ? { backgroundColor: theme.colors.primary }
-                            : { backgroundColor: theme.colors.surfaceVariant }
-                    ]}
-                    elevation={1}
+                <TouchableOpacity
+                    onLongPress={onLongPress}
+                    delayLongPress={300}
+                    activeOpacity={0.8}
                 >
-                    {message.content && (
-                        <Text style={isCurrentUser ? styles.textWhite : styles.textDark}>
-                            {message.content}
-                        </Text>
-                    )}
-                    {message.imageUrl && (
-                        <Image 
-                            source={{ uri: message.imageUrl }} 
-                            style={styles.messageImage}
-                            resizeMode="cover"
-                        />
-                    )}
-                </Surface>
+                    <Surface
+                        style={[
+                            styles.bubble,
+                            isCurrentUser
+                                ? { backgroundColor: theme.colors.primary }
+                                : { backgroundColor: theme.colors.surfaceVariant }
+                        ]}
+                        elevation={1}
+                    >
+                        {message.content && (
+                            <Text style={isCurrentUser ? styles.textWhite : styles.textDark}>
+                                {message.content}
+                            </Text>
+                        )}
+                        {message.imageUrl && (
+                            <Image
+                                source={{ uri: message.imageUrl }}
+                                style={styles.messageImage}
+                                resizeMode="cover"
+                            />
+                        )}
+                    </Surface>
+                </TouchableOpacity>
+
+                {reactions.length > 0 && (
+                    <ReactionBar
+                        reactions={reactions}
+                        currentUserId={CURRENT_USER_ID}
+                        onReactionPress={handleReactionPress}
+                    />
+                )}
 
                 {message.sentAt && (
                     <Text variant="labelSmall" style={styles.timestamp}>
@@ -73,6 +106,14 @@ export function MessageBubble({
                 <Image
                     source={{ uri: avatarUrl }}
                     style={styles.avatar}
+                />
+            )}
+
+            {/* Reaction picker modal */}
+            {showPicker && onSelectEmoji && onClosePicker && (
+                <ReactionPicker
+                    onSelectEmoji={onSelectEmoji}
+                    onClose={onClosePicker}
                 />
             )}
         </View>

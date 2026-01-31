@@ -276,3 +276,19 @@ export type GroupMemberResponse = {
 };
 
 export type GroupMemberListResponse = PaginatedResponse<GroupMemberResponse>;
+
+export type ReactionCreateRequest = {
+  emoji: string;
+  userId: number;
+  messageId: number;
+};
+
+export type ReactionResponse = {
+  id: number | null;
+  emoji: string;
+  userId: number;
+  messageId: number;
+  createdAt: string | null;
+};
+
+export type ReactionListResponse = PaginatedResponse<ReactionResponse>;
