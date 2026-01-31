@@ -29,7 +29,21 @@ export function Input({
             numberOfLines={numberOfLines}
             secureTextEntry={secureTextEntry}
             mode="outlined"
-            style={{ marginBottom: 16 }}
+            style={{ 
+                marginBottom: 20,
+                backgroundColor: '#FAFAFA',
+                borderRadius: 16,
+                fontSize: 16,
+                fontFamily: 'System',
+            }}
+            theme={{
+                colors: {
+                    primary: '#8F88B8',
+                    background: '#FAFAFA',
+                    onSurface: '#9A9AA5',
+                    outline: '#E6E4F2',
+                },
+            }}
         />
     );
 }

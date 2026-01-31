@@ -12,6 +12,10 @@ export default function GroupsScreen() {
         <Screen scrollable={false}>
             <Appbar.Header>
                 <Appbar.Content title="Mes Groupes" />
+                <Appbar.Action 
+                    icon="plus" 
+                    onPress={() => router.push('/modal')} 
+                />
             </Appbar.Header>
 
             <View style={styles.container}>

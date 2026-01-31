@@ -35,9 +35,27 @@ export function Button({
             onPress={onPress}
             loading={loading}
             disabled={disabled}
-            buttonColor={buttonColor}
-            contentStyle={contentStyle}
-            style={style}
+            buttonColor={buttonColor || '#8F88B8'}
+            textColor="#FFFFFF"
+            contentStyle={{
+                ...contentStyle,
+                paddingHorizontal: 24,
+                paddingVertical: 12,
+            }}
+            style={[
+                {
+                    borderRadius: 24,
+                    shadowColor: '#000',
+                    shadowOffset: {
+                        width: 0,
+                        height: 6,
+                    },
+                    shadowOpacity: 0.08,
+                    shadowRadius: 20,
+                    elevation: 8,
+                },
+                style,
+            ]}
         >
             {children}
         </PaperButton>
