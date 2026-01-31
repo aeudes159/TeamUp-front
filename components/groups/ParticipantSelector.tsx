@@ -45,8 +45,6 @@ export function ParticipantSelector({ participants, onParticipantsChange, disabl
 
     return (
         <View style={styles.container}>
-            <Text style={styles.label}>Participants</Text>
-            
             <View style={styles.participantsList}>
                 {participants.map((participant) => (
                     <Chip
