@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { View, StyleSheet, FlatList, Alert } from 'react-native';
+import React, { useState } from 'react';
+import { View, StyleSheet, FlatList, Alert, Animated } from 'react-native';
 import { Screen } from '@/components/layout/Screen';
 import { PostCard } from '@/components/feed/PostCard';
 import { CreatePostModal } from '@/components/feed/CreatePostModal';
@@ -10,6 +10,8 @@ import { useCommentCount } from '@/hooks/useComments';
 import { useUsers } from '@/hooks/useUsers';
 import { useLocations } from '@/hooks/useLocations';
 import { Appbar, Text, FAB, ActivityIndicator } from 'react-native-paper';
+import { colors, borderRadius, shadows, typography } from '@/constants/theme';
+import { Sparkles, Coffee } from 'lucide-react-native';
 import type { Post, User, Location, NewPost } from '@/types';
 
 // TODO: Replace with actual auth when implemented
@@ -66,6 +68,28 @@ export default function FeedScreen() {
     // Comments drawer state
     const [showCommentsDrawer, setShowCommentsDrawer] = useState(false);
     const [selectedPostId, setSelectedPostId] = useState<number | null>(null);
+
+    // Animation values
+    const fadeAnim = useState(new Animated.Value(0))[0];
+    const slideAnim = useState(new Animated.Value(50))[0];
+
+    // Entrance animation
+    React.useEffect(() => {
+        if (!isLoading && posts && posts.length > 0) {
+            Animated.parallel([
+                Animated.timing(fadeAnim, {
+                    toValue: 1,
+                    duration: 800,
+                    useNativeDriver: true,
+                }),
+                Animated.timing(slideAnim, {
+                    toValue: 0,
+                    duration: 600,
+                    useNativeDriver: true,
+                }),
+            ]).start();
+        }
+    }, [isLoading, posts, fadeAnim, slideAnim]);
 
     // Helper functions
     const findAuthor = (authorId: number | null): User | undefined => {
@@ -148,12 +172,20 @@ export default function FeedScreen() {
     // Render empty state
     const renderEmptyState = () => (
         <View style={styles.emptyContainer}>
-            <Text variant="bodyLarge" style={styles.emptyText}>
-                No posts yet
+            <View style={styles.emptyIconContainer}>
+                <Coffee size={48} color={colors.coral} />
+            </View>
+            <Text style={styles.emptyText}>
+                Aucune activité pour le moment
             </Text>
-            <Text variant="bodyMedium" style={styles.emptySubtext}>
-                Be the first to share something with your team!
+            <Text style={styles.emptySubtext}>
+                Soyez le premier à partager un moment avec votre équipe !
             </Text>
+            <View style={styles.decorativeDots}>
+                <View style={[styles.dot, { backgroundColor: colors.lilac }]} />
+                <View style={[styles.dot, { backgroundColor: colors.yellow }]} />
+                <View style={[styles.dot, { backgroundColor: colors.coral }]} />
+            </View>
         </View>
     );
 
@@ -161,13 +193,19 @@ export default function FeedScreen() {
     if (isLoading) {
         return (
             <Screen scrollable={false}>
-                <Appbar.Header>
-                    <Appbar.Content title="Feed" />
-                </Appbar.Header>
+                <View style={styles.header}>
+                    <View style={styles.headerContent}>
+                        <Sparkles size={24} color={colors.yellow} />
+                        <Text style={styles.headerTitle}>TeamUp</Text>
+                        <Sparkles size={24} color={colors.coral} />
+                    </View>
+                </View>
                 <View style={styles.loadingContainer}>
-                    <ActivityIndicator size="large" color="#6366f1" />
-                    <Text variant="bodyMedium" style={styles.loadingText}>
-                        Loading posts...
+                    <View style={styles.loadingIconContainer}>
+                        <ActivityIndicator size="large" color={colors.lilac} />
+                    </View>
+                    <Text style={styles.loadingText}>
+                        Chargement des activités...
                     </Text>
                 </View>
             </Screen>
@@ -176,9 +214,13 @@ export default function FeedScreen() {
 
     return (
         <Screen scrollable={false}>
-            <Appbar.Header>
-                <Appbar.Content title="Feed" />
-            </Appbar.Header>
+            <View style={styles.header}>
+                <View style={styles.headerContent}>
+                    <Sparkles size={24} color={colors.yellow} />
+                    <Text style={styles.headerTitle}>TeamUp</Text>
+                    <Sparkles size={24} color={colors.coral} />
+                </View>
+            </View>
 
             <View style={styles.container}>
                 {error && (
@@ -191,34 +233,75 @@ export default function FeedScreen() {
 
                 {(!posts || posts.length === 0) ? (
                     renderEmptyState()
-                ) : (
-                    <FlatList
-                        data={posts}
-                        keyExtractor={(item) => String(item.id)}
-                        renderItem={({ item }) => (
-                            <PostCardWithComments
-                                post={item}
-                                author={findAuthor(item.authorId)}
-                                location={findLocation(item.locationId)}
-                                currentUserId={CURRENT_USER_ID}
-                                onCommentPress={() => handleOpenComments(item)}
-                                onEditPress={() => handleOpenEdit(item)}
-                                onDeletePress={() => handleDeletePost(item)}
-                            />
-                        )}
-                        contentContainerStyle={styles.listContent}
-                        showsVerticalScrollIndicator={false}
-                    />
+                 ) : (
+                    <Animated.View
+                        style={[
+                            styles.listContainer,
+                            {
+                                opacity: fadeAnim,
+                                transform: [{ translateY: slideAnim }],
+                            },
+                        ]}
+                    >
+                        <FlatList
+                            data={posts}
+                            keyExtractor={(item) => String(item.id)}
+                            renderItem={({ item, index }) => (
+                                <Animated.View
+                                    style={{
+                                        opacity: fadeAnim,
+                                        transform: [
+                                            {
+                                                translateY: slideAnim.interpolate({
+                                                    inputRange: [0, 1],
+                                                    outputRange: [0, 20 * index],
+                                                }),
+                                            },
+                                        ],
+                                    }}
+                                >
+                                    <PostCardWithComments
+                                        post={item}
+                                        author={findAuthor(item.authorId)}
+                                        location={findLocation(item.locationId)}
+                                        currentUserId={CURRENT_USER_ID}
+                                        onCommentPress={() => handleOpenComments(item)}
+                                        onEditPress={() => handleOpenEdit(item)}
+                                        onDeletePress={() => handleDeletePost(item)}
+                                    />
+                                </Animated.View>
+                            )}
+                            contentContainerStyle={styles.listContent}
+                            showsVerticalScrollIndicator={false}
+                        />
+                    </Animated.View>
                 )}
             </View>
 
             {/* FAB for creating new post */}
-            <FAB
-                icon="plus"
-                style={styles.fab}
-                onPress={() => setShowCreateModal(true)}
-                color="#ffffff"
-            />
+            <Animated.View
+                style={[
+                    styles.fab,
+                    {
+                        opacity: fadeAnim,
+                        transform: [
+                            {
+                                scale: fadeAnim.interpolate({
+                                    inputRange: [0, 1],
+                                    outputRange: [0.8, 1],
+                                }),
+                            },
+                        ],
+                    },
+                ]}
+            >
+                <FAB
+                    icon="plus"
+                    style={styles.fabButton}
+                    onPress={() => setShowCreateModal(true)}
+                    color="#ffffff"
+                />
+            </Animated.View>
 
             {/* Create Post Modal */}
             <CreatePostModal
@@ -258,15 +341,47 @@ export default function FeedScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: colors.background,
+    },
+    listContainer: {
+        flex: 1,
+    },
+    header: {
+        backgroundColor: colors.background,
+        paddingTop: 16,
+        paddingBottom: 8,
+        paddingHorizontal: 20,
+        ...shadows.soft,
+    },
+    headerContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 12,
+    },
+    headerTitle: {
+        ...typography.titleLarge,
+        color: colors.card,
+        fontWeight: '700',
     },
     loadingContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+        paddingHorizontal: 32,
+    },
+    loadingIconContainer: {
+        padding: 20,
+        borderRadius: borderRadius.xl,
+        backgroundColor: colors.card,
+        marginBottom: 20,
+        ...shadows.warm,
     },
     loadingText: {
+        ...typography.bodyMedium,
+        color: colors.card,
+        textAlign: 'center',
         marginTop: 12,
-        color: '#6b7280',
     },
     emptyContainer: {
         flex: 1,
@@ -274,21 +389,41 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         padding: 32,
     },
+    emptyIconContainer: {
+        padding: 20,
+        borderRadius: borderRadius.xl,
+        backgroundColor: colors.card,
+        marginBottom: 24,
+        ...shadows.artistic,
+    },
     emptyText: {
+        ...typography.titleMedium,
+        color: colors.card,
         textAlign: 'center',
-        color: '#374151',
-        fontWeight: '600',
+        marginBottom: 8,
     },
     emptySubtext: {
+        ...typography.bodyMedium,
+        color: colors.cardLight,
         textAlign: 'center',
-        color: '#6b7280',
-        marginTop: 8,
+        marginBottom: 32,
+        lineHeight: 24,
+    },
+    decorativeDots: {
+        flexDirection: 'row',
+        gap: 12,
+        marginTop: 20,
+    },
+    dot: {
+        width: 12,
+        height: 12,
+        borderRadius: borderRadius.pill,
     },
     errorContainer: {
         padding: 16,
         backgroundColor: '#fee2e2',
         margin: 16,
-        borderRadius: 8,
+        borderRadius: borderRadius.lg,
     },
     errorText: {
         color: '#dc2626',
@@ -296,14 +431,18 @@ const styles = StyleSheet.create({
     },
     listContent: {
         flexGrow: 1,
-        paddingBottom: 80, // Space for FAB
+        paddingBottom: 100,
         paddingHorizontal: 16,
-        paddingTop: 8,
+        paddingTop: 16,
     },
     fab: {
         position: 'absolute',
-        right: 16,
-        bottom: 16,
-        backgroundColor: '#6366f1',
+        right: 20,
+        bottom: 20,
+    },
+    fabButton: {
+        backgroundColor: colors.coral,
+        borderRadius: borderRadius.pill,
+        ...shadows.warm,
     },
 });

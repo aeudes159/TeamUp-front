@@ -2,6 +2,8 @@ import { FlatList, View, StyleSheet } from 'react-native';
 import { Text, ActivityIndicator } from 'react-native-paper';
 import { PostCard } from './PostCard';
 import { mockUsers, mockLocations } from '@/mock/data';
+import { colors, borderRadius, shadows, typography } from '@/constants/theme';
+import { Coffee } from 'lucide-react-native';
 import type { Post, User, Location } from '@/types';
 
 type FeedListProps = {
@@ -34,9 +36,11 @@ export function FeedList({
     if (isLoading) {
         return (
             <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" />
-                <Text variant="bodyMedium" style={styles.loadingText}>
-                    Chargement des posts...
+                <View style={styles.loadingIconContainer}>
+                    <ActivityIndicator size="large" color={colors.lilac} />
+                </View>
+                <Text style={styles.loadingText}>
+                    Chargement des activités...
                 </Text>
             </View>
         );
@@ -45,12 +49,20 @@ export function FeedList({
     if (posts.length === 0) {
         return (
             <View style={styles.emptyContainer}>
-                <Text variant="bodyLarge" style={styles.emptyText}>
-                    Aucun post pour le moment
+                <View style={styles.emptyIconContainer}>
+                    <Coffee size={48} color={colors.coral} />
+                </View>
+                <Text style={styles.emptyText}>
+                    Aucune activité pour le moment
                 </Text>
-                <Text variant="bodyMedium" style={styles.emptySubtext}>
-                    Soyez le premier a partager une activite !
+                <Text style={styles.emptySubtext}>
+                    Soyez le premier à partager un moment avec votre équipe !
                 </Text>
+                <View style={styles.decorativeDots}>
+                    <View style={[styles.dot, { backgroundColor: colors.lilac }]} />
+                    <View style={[styles.dot, { backgroundColor: colors.yellow }]} />
+                    <View style={[styles.dot, { backgroundColor: colors.coral }]} />
+                </View>
             </View>
         );
     }
@@ -79,9 +91,18 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         padding: 32,
     },
+    loadingIconContainer: {
+        padding: 20,
+        borderRadius: borderRadius.xl,
+        backgroundColor: colors.card,
+        marginBottom: 20,
+        ...shadows.warm,
+    },
     loadingText: {
+        ...typography.bodyMedium,
+        color: colors.card,
+        textAlign: 'center',
         marginTop: 16,
-        color: '#6b7280',
     },
     emptyContainer: {
         flex: 1,
@@ -89,15 +110,35 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         padding: 32,
     },
+    emptyIconContainer: {
+        padding: 20,
+        borderRadius: borderRadius.xl,
+        backgroundColor: colors.card,
+        marginBottom: 24,
+        ...shadows.artistic,
+    },
     emptyText: {
+        ...typography.titleMedium,
+        color: colors.card,
         textAlign: 'center',
-        color: '#374151',
-        fontWeight: '600',
+        marginBottom: 8,
     },
     emptySubtext: {
+        ...typography.bodyMedium,
+        color: colors.cardLight,
         textAlign: 'center',
-        color: '#6b7280',
-        marginTop: 8,
+        marginBottom: 32,
+        lineHeight: 24,
+    },
+    decorativeDots: {
+        flexDirection: 'row',
+        gap: 12,
+        marginTop: 20,
+    },
+    dot: {
+        width: 12,
+        height: 12,
+        borderRadius: borderRadius.pill,
     },
     listContent: {
         flexGrow: 1,
