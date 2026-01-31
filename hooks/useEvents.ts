@@ -1,54 +1,84 @@
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { supabase } from '@/lib/supabase';
 import { queryClient } from '@/lib/queryClient';
+import { mockEvents } from '@/mock/data';
 import type { Event, NewEvent } from '@/types';
 
-// Fetch tous les événements
+/**
+ * TODO: Replace mock data with API calls when /api/events endpoint is available
+ * 
+ * The backend events endpoint is coming soon. Once available, update this hook to:
+ * 
+ * import { apiGet, apiPost, apiDelete, buildQueryString } from '@/lib/api';
+ * 
+ * And change queryFn to:
+ *   const response = await apiGet<EventListResponse>(`/api/events${queryString}`);
+ *   return response.data as Event[];
+ */
+
+/**
+ * Fetch all events (currently using mock data)
+ */
 export function useEvents() {
   return useQuery({
     queryKey: ['events'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('events')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      return data as Event[];
+      // TODO: Replace with API call when endpoint is available
+      // const response = await apiGet<EventListResponse>('/api/events');
+      // return response.data as Event[];
+      
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 100));
+      return mockEvents as Event[];
     },
   });
 }
 
-// Fetch un événement par ID
-export function useEvent(id: string) {
+/**
+ * Fetch a single event by ID (currently using mock data)
+ */
+export function useEvent(id: string | undefined) {
   return useQuery({
     queryKey: ['events', id],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('events')
-        .select('*')
-        .eq('id', id)
-        .single();
-
-      if (error) throw error;
-      return data as Event;
+      // TODO: Replace with API call when endpoint is available
+      // const response = await apiGet<EventResponse>(`/api/events/${id}`);
+      // return response as Event;
+      
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 100));
+      const event = mockEvents.find(e => e.id === id);
+      if (!event) {
+        throw new Error(`Event with id ${id} not found`);
+      }
+      return event as Event;
     },
     enabled: !!id,
   });
 }
 
-// Créer un événement
+/**
+ * Create a new event (currently using mock data)
+ */
 export function useCreateEvent() {
   return useMutation({
     mutationFn: async (newEvent: NewEvent) => {
-      const { data, error } = await supabase
-        .from('events')
-        .insert(newEvent)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data as Event;
+      // TODO: Replace with API call when endpoint is available
+      // const response = await apiPost<EventResponse>('/api/events', newEvent);
+      // return response as Event;
+      
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Create a mock event with generated ID
+      const event: Event = {
+        ...newEvent,
+        id: `mock-${Date.now()}`,
+        created_at: new Date().toISOString(),
+      };
+      
+      // Note: This won't persist since we're using mock data
+      // In a real implementation, the server would store it
+      return event;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['events'] });
@@ -56,16 +86,21 @@ export function useCreateEvent() {
   });
 }
 
-// Supprimer un événement
+/**
+ * Delete an event (currently using mock data)
+ */
 export function useDeleteEvent() {
   return useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from('events')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
+      // TODO: Replace with API call when endpoint is available
+      // await apiDelete(`/api/events/${id}`);
+      
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Note: This won't actually delete from mock data
+      // In a real implementation, the server would handle deletion
+      return { id };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['events'] });

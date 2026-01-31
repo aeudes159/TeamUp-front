@@ -3,21 +3,37 @@ import { Surface, Text } from 'react-native-paper';
 import type { MessageBubbleProps } from '@/types';
 import { useTheme } from 'react-native-paper';
 
-export function MessageBubble({ message, isCurrentUser }: Readonly<MessageBubbleProps>) {
+/**
+ * MessageBubble component for displaying chat messages
+ * 
+ * Note: The new API doesn't include avatar_url and username in the message.
+ * These should be passed via the optional senderName and senderAvatar props,
+ * or fetched separately using the senderId.
+ */
+export function MessageBubble({ 
+    message, 
+    isCurrentUser,
+    senderName,
+    senderAvatar 
+}: Readonly<MessageBubbleProps>) {
     const theme = useTheme();
+    
+    // Default avatar placeholder
+    const avatarUrl = senderAvatar || `https://i.pravatar.cc/150?u=${message.senderId}`;
+    const displayName = senderName || `User ${message.senderId}`;
     
     return (
         <View style={[styles.container, isCurrentUser ? styles.containerEnd : styles.containerStart]}>
             {!isCurrentUser && (
                 <Image
-                    source={{ uri: message.avatar_url }}
+                    source={{ uri: avatarUrl }}
                     style={styles.avatar}
                 />
             )}
 
             <View style={[styles.messageContainer, isCurrentUser ? styles.messageEnd : styles.messageStart]}>
                 {!isCurrentUser && (
-                    <Text variant="labelSmall" style={styles.username}>{message.username}</Text>
+                    <Text variant="labelSmall" style={styles.username}>{displayName}</Text>
                 )}
 
                 <Surface 
@@ -29,22 +45,33 @@ export function MessageBubble({ message, isCurrentUser }: Readonly<MessageBubble
                     ]}
                     elevation={1}
                 >
-                    <Text style={isCurrentUser ? styles.textWhite : styles.textDark}>
-                        {message.content}
-                    </Text>
+                    {message.content && (
+                        <Text style={isCurrentUser ? styles.textWhite : styles.textDark}>
+                            {message.content}
+                        </Text>
+                    )}
+                    {message.imageUrl && (
+                        <Image 
+                            source={{ uri: message.imageUrl }} 
+                            style={styles.messageImage}
+                            resizeMode="cover"
+                        />
+                    )}
                 </Surface>
 
-                <Text variant="labelSmall" style={styles.timestamp}>
-                    {new Date(message.created_at).toLocaleTimeString('fr-FR', {
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    })}
-                </Text>
+                {message.sentAt && (
+                    <Text variant="labelSmall" style={styles.timestamp}>
+                        {new Date(message.sentAt).toLocaleTimeString('fr-FR', {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        })}
+                    </Text>
+                )}
             </View>
 
             {isCurrentUser && (
                 <Image
-                    source={{ uri: message.avatar_url }}
+                    source={{ uri: avatarUrl }}
                     style={styles.avatar}
                 />
             )}
@@ -56,6 +83,7 @@ const styles = StyleSheet.create({
     container: {
         flexDirection: 'row',
         marginBottom: 16,
+        paddingHorizontal: 8,
     },
     containerStart: {
         justifyContent: 'flex-start',
@@ -87,12 +115,19 @@ const styles = StyleSheet.create({
         borderRadius: 16,
         paddingHorizontal: 16,
         paddingVertical: 12,
+        overflow: 'hidden',
     },
     textWhite: {
         color: '#ffffff',
     },
     textDark: {
         color: '#1f2937',
+    },
+    messageImage: {
+        width: 200,
+        height: 150,
+        borderRadius: 8,
+        marginTop: 8,
     },
     timestamp: {
         marginTop: 4,

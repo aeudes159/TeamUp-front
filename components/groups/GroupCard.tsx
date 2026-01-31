@@ -9,13 +9,20 @@ export function GroupCard({ group, onPress }: Readonly<GroupCardProps>) {
                 <View style={styles.container}>
                     <View style={styles.textContainer}>
                         <Text variant="titleMedium" style={styles.name}>{group.name}</Text>
-                        <Text variant="bodySmall" style={styles.description}>{group.description}</Text>
+                        {group.createdAt && (
+                            <Text variant="bodySmall" style={styles.description}>
+                                Created {new Date(group.createdAt).toLocaleDateString()}
+                            </Text>
+                        )}
                     </View>
-                    <Chip icon="account-group">
-                        {group.member_count}
+                    <Chip icon={group.isPublic ? "earth" : "lock"}>
+                        {group.isPublic ? 'Public' : 'Private'}
                     </Chip>
                 </View>
             </Card.Content>
+            {group.coverPictureUrl && (
+                <Card.Cover source={{ uri: group.coverPictureUrl }} />
+            )}
         </Card>
     );
 }
