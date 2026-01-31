@@ -26,7 +26,7 @@ export function LocationCard({ location, onPress, onEdit, onDelete, showActions 
                                     <IconButton
                                         icon="pencil"
                                         size={18}
-                                        iconColor="#ffffff"
+                                        iconColor="#FFFFFF"
                                         style={styles.actionButton}
                                         onPress={(e) => {
                                             e.stopPropagation?.();
@@ -38,7 +38,7 @@ export function LocationCard({ location, onPress, onEdit, onDelete, showActions 
                                     <IconButton
                                         icon="delete"
                                         size={18}
-                                        iconColor="#ffffff"
+                                        iconColor="#FFFFFF"
                                         style={styles.deleteButton}
                                         onPress={(e) => {
                                             e.stopPropagation?.();
@@ -62,7 +62,7 @@ export function LocationCard({ location, onPress, onEdit, onDelete, showActions 
                                     <IconButton
                                         icon="pencil"
                                         size={18}
-                                        iconColor="#6366f1"
+                                        iconColor="#B8A1D9"
                                         style={styles.noImageActionButton}
                                         onPress={(e) => {
                                             e.stopPropagation?.();
@@ -74,7 +74,7 @@ export function LocationCard({ location, onPress, onEdit, onDelete, showActions 
                                     <IconButton
                                         icon="delete"
                                         size={18}
-                                        iconColor="#ef4444"
+                                        iconColor="#F08A5D"
                                         style={styles.noImageActionButton}
                                         onPress={(e) => {
                                             e.stopPropagation?.();
@@ -105,36 +105,44 @@ export function LocationCard({ location, onPress, onEdit, onDelete, showActions 
 
 const styles = StyleSheet.create({
     card: {
-        backgroundColor: '#fff',
-        borderRadius: 12,
+        backgroundColor: '#F3D1C8',
+        borderRadius: 24,
         overflow: 'hidden',
-        marginBottom: 16,
-        elevation: 2,
+        marginBottom: 20,
+        elevation: 4,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.12,
+        shadowRadius: 8,
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.3)',
     },
     imageContainer: {
         position: 'relative',
     },
     image: {
         width: '100%',
-        height: 160,
+        height: 180,
     },
     imageActions: {
         position: 'absolute',
-        top: 8,
-        right: 8,
+        top: 12,
+        right: 12,
         flexDirection: 'row',
-        gap: 4,
+        gap: 8,
     },
     actionButton: {
-        backgroundColor: 'rgba(99, 102, 241, 0.9)',
+        backgroundColor: 'rgba(184, 161, 217, 0.9)',
         margin: 0,
+        borderRadius: 16,
     },
     deleteButton: {
-        backgroundColor: 'rgba(239, 68, 68, 0.9)',
+        backgroundColor: 'rgba(240, 138, 93, 0.9)',
         margin: 0,
+        borderRadius: 16,
     },
     content: {
-        padding: 12,
+        padding: 20,
     },
     headerRow: {
         flexDirection: 'row',
@@ -142,25 +150,36 @@ const styles = StyleSheet.create({
         alignItems: 'flex-start',
     },
     name: {
-        fontWeight: '600',
-        color: '#111827',
+        fontWeight: '700',
+        color: '#2E1A47',
         flex: 1,
+        fontSize: 18,
+        fontFamily: 'System',
     },
     noImageActions: {
         flexDirection: 'row',
-        marginLeft: 8,
+        marginLeft: 12,
     },
     noImageActionButton: {
         margin: 0,
         marginLeft: -4,
+        borderRadius: 16,
     },
     address: {
-        marginTop: 4,
-        color: '#6b7280',
+        marginTop: 8,
+        color: '#3A235A',
+        fontSize: 15,
+        opacity: 0.8,
     },
     price: {
-        marginTop: 8,
-        color: '#374151',
-        fontWeight: '500',
+        marginTop: 12,
+        color: '#3A235A',
+        fontWeight: '600',
+        fontSize: 16,
+        backgroundColor: '#F6D186',
+        alignSelf: 'flex-start',
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 12,
     },
 });

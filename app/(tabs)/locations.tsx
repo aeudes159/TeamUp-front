@@ -9,7 +9,7 @@ import { useLocations, useCreateLocation, useUpdateLocation, useDeleteLocation }
 import type { Location, NewLocation } from '@/types';
 import { LocationSort } from '@/types/api';
 
-export default function EventsScreen() {
+export default function LocationsScreen() {
     const [search, setSearch] = useState('');
     const [minPrice, setMinPrice] = useState<number | undefined>(undefined);
     const [maxPrice, setMaxPrice] = useState<number | undefined>(undefined);
@@ -106,8 +106,16 @@ export default function EventsScreen() {
 
     return (
         <Screen scrollable={false}>
-            <Appbar.Header>
-                <Appbar.Content title="Événements" />
+            <Appbar.Header style={{ backgroundColor: '#2E1A47' }}>
+                <Appbar.Content 
+                    title="Lieux" 
+                    titleStyle={{ 
+                        color: '#FFFFFF', 
+                        fontWeight: '700', 
+                        fontSize: 22,
+                        fontFamily: 'System'
+                    }} 
+                />
             </Appbar.Header>
 
             <View style={styles.filtersContainer}>
@@ -118,7 +126,7 @@ export default function EventsScreen() {
                         onChangeText={setSearch}
                         style={styles.searchbar}
                         inputStyle={styles.searchbarInput}
-                        iconColor="#6b7280"
+                        iconColor="#3A235A"
                     />
 
                     <Menu
@@ -265,73 +273,111 @@ export default function EventsScreen() {
 
 const styles = StyleSheet.create({
     filtersContainer: {
-        paddingHorizontal: 12,
-        paddingVertical: 8,
-        gap: 12,
+        paddingHorizontal: 20,
+        paddingVertical: 16,
+        gap: 20,
+        backgroundColor: '#F6E6D8',
     },
     topRow: {
         flexDirection: 'row',
         flexWrap: 'wrap',
         alignItems: 'center',
-        gap: 8,
+        gap: 12,
     },
     searchbar: {
         flex: 1,
-        minWidth: 150,
-        maxWidth: 300,
-        borderRadius: 12,
-        height: 40,
+        minWidth: 180,
+        maxWidth: 320,
+        borderRadius: 24,
+        height: 48,
+        backgroundColor: '#FFFFFF',
+        elevation: 2,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
     },
     searchbarInput: {
-        paddingVertical: 6,
-        fontSize: 14,
+        paddingVertical: 8,
+        fontSize: 16,
+        fontFamily: 'System',
     },
     sortButton: {
-        borderRadius: 12,
-        height: 40,
+        borderRadius: 24,
+        height: 48,
         justifyContent: 'center',
-        minWidth: 130,
+        minWidth: 140,
+        backgroundColor: '#FFFFFF',
+        elevation: 2,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
     },
     sortButtonContent: {
-        paddingHorizontal: 8,
+        paddingHorizontal: 16,
     },
     sortButtonLabel: {
-        fontSize: 13,
+        fontSize: 14,
+        fontWeight: '600',
+        color: '#3A235A',
     },
     priceFiltersRow: {
         flexDirection: 'row',
-        gap: 8,
+        gap: 12,
         flexWrap: 'wrap',
         alignItems: 'center',
     },
     priceFilterLabel: {
-        fontSize: 16,
-        marginRight: 8,
+        fontSize: 18,
+        marginRight: 12,
         alignSelf: 'center',
+        fontWeight: '700',
+        color: '#3A235A',
+        fontFamily: 'System',
     },
     priceButton: {
-        borderRadius: 12,
-        minWidth: 80,
-        height: 36,
+        borderRadius: 20,
+        minWidth: 90,
+        height: 40,
         justifyContent: 'center',
+        elevation: 2,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.08,
+        shadowRadius: 3,
     },
     container: {
         flex: 1,
+        backgroundColor: '#F6E6D8',
     },
     errorContainer: {
-        padding: 16,
-        backgroundColor: '#fee2e2',
-        margin: 16,
-        borderRadius: 8,
+        padding: 20,
+        backgroundColor: '#FEE2E2',
+        margin: 20,
+        borderRadius: 20,
+        elevation: 2,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
     },
     errorText: {
-        color: '#dc2626',
+        color: '#DC2626',
         textAlign: 'center',
+        fontSize: 16,
+        fontWeight: '500',
     },
     fab: {
         position: 'absolute',
-        right: 16,
-        bottom: 16,
-        backgroundColor: '#6366f1',
+        right: 20,
+        bottom: 20,
+        backgroundColor: '#F08A5D',
+        borderRadius: 30,
+        elevation: 6,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.15,
+        shadowRadius: 8,
     },
 });
