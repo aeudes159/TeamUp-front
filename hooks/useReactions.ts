@@ -33,6 +33,29 @@ export function useReactions(
 }
 
 /**
+ * Fetch reactions for a specific comment
+ */
+export function useCommentReactions(
+  commentId: number | undefined,
+  params: PaginationParams = { page: 0, size: 50 }
+) {
+  return useQuery({
+    queryKey: ['reactions', 'by-comment', commentId, params],
+    queryFn: async () => {
+      const queryString = buildQueryString({
+        page: params.page,
+        size: params.size,
+      });
+      const response = await apiGet<ReactionListResponse>(
+        `/api/reactions/by-comment/${commentId}${queryString}`
+      );
+      return response.data as Reaction[];
+    },
+    enabled: !!commentId,
+  });
+}
+
+/**
  * Fetch all reactions by a user (useful for notifications)
  */
 export function useUserReactions(
@@ -78,6 +101,28 @@ export function useAddReaction() {
 }
 
 /**
+ * Add a reaction to a comment
+ */
+export function useAddCommentReaction() {
+  return useMutation({
+    mutationFn: async (newReaction: NewReaction) => {
+      const response = await apiPost<ReactionResponse>('/api/reactions', {
+        emoji: newReaction.emoji,
+        userId: newReaction.userId,
+        commentId: newReaction.commentId,
+      });
+      return response as Reaction;
+    },
+    onSuccess: (_, variables) => {
+      // Invalidate reactions for this comment
+      queryClient.invalidateQueries({
+        queryKey: ['reactions', 'by-comment', variables.commentId]
+      });
+    },
+  });
+}
+
+/**
  * Remove a reaction
  */
 export function useRemoveReaction() {
@@ -96,6 +141,24 @@ export function useRemoveReaction() {
 }
 
 /**
+ * Remove a reaction from a comment
+ */
+export function useRemoveCommentReaction() {
+  return useMutation({
+    mutationFn: async ({ id, commentId }: { id: number; commentId: number }) => {
+      await apiDelete(`/api/reactions/${id}`);
+      return { id, commentId };
+    },
+    onSuccess: (variables) => {
+      // Invalidate reactions for this comment
+      queryClient.invalidateQueries({
+        queryKey: ['reactions', 'by-comment', variables.commentId]
+      });
+    },
+  });
+}
+
+/**
  * Check if current user has reacted to a message with a specific emoji
  */
 export function useMyReactionOnMessage(
@@ -104,6 +167,32 @@ export function useMyReactionOnMessage(
   reactions: Reaction[] | undefined
 ) {
   if (!messageId || !userId || !reactions) {
+    return {
+      hasReacted: (emoji: string) => false,
+      getMyReaction: (emoji: string) => undefined,
+    };
+  }
+
+  const hasReacted = (emoji: string) => {
+    return reactions.some(r => r.userId === userId && r.emoji === emoji);
+  };
+
+  const getMyReaction = (emoji: string) => {
+    return reactions.find(r => r.userId === userId && r.emoji === emoji);
+  };
+
+  return { hasReacted, getMyReaction };
+}
+
+/**
+ * Check if current user has reacted to a comment with a specific emoji
+ */
+export function useMyReactionOnComment(
+  commentId: number | undefined,
+  userId: number | undefined,
+  reactions: Reaction[] | undefined
+) {
+  if (!commentId || !userId || !reactions) {
     return {
       hasReacted: (emoji: string) => false,
       getMyReaction: (emoji: string) => undefined,

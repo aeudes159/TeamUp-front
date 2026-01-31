@@ -1,15 +1,33 @@
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { Image } from 'expo-image';
 import { Card, Text, Avatar } from 'react-native-paper';
-import { MapPin, Clock } from 'lucide-react-native';
-import type { Post, User, Location, PostCardProps } from '@/types';
+import { MapPin, Clock, MessageCircle, Pencil, Trash2 } from 'lucide-react-native';
+import type { Post, User, Location } from '@/types';
+
+type PostCardProps = {
+    post: Post;
+    author?: User;
+    location?: Location;
+    commentCount?: number;
+    currentUserId?: number;
+    onPress?: () => void;
+    onCommentPress?: () => void;
+    onEditPress?: () => void;
+    onDeletePress?: () => void;
+};
 
 export function PostCard({
     post,
     author,
     location,
+    commentCount = 0,
+    currentUserId,
     onPress,
+    onCommentPress,
+    onEditPress,
+    onDeletePress,
 }: Readonly<PostCardProps>) {
+    const isAuthor = currentUserId !== undefined && post.authorId === currentUserId;
     const formatDate = (dateString: string | null) => {
         if (!dateString) return '';
         const date = new Date(dateString);
@@ -75,6 +93,38 @@ export function PostCard({
                         </Text>
                     </View>
                 )}
+
+                {/* Actions Row */}
+                <View style={styles.actionsRow}>
+                    {/* Comment Button */}
+                    <TouchableOpacity 
+                        style={styles.commentButton}
+                        onPress={onCommentPress}
+                    >
+                        <MessageCircle size={18} color="#6b7280" />
+                        <Text variant="bodySmall" style={styles.commentCount}>
+                            {commentCount} {commentCount === 1 ? 'comment' : 'comments'}
+                        </Text>
+                    </TouchableOpacity>
+
+                    {/* Edit/Delete buttons for author */}
+                    {isAuthor && (
+                        <View style={styles.authorActions}>
+                            <TouchableOpacity 
+                                style={styles.actionIconButton}
+                                onPress={onEditPress}
+                            >
+                                <Pencil size={16} color="#6b7280" />
+                            </TouchableOpacity>
+                            <TouchableOpacity 
+                                style={styles.actionIconButton}
+                                onPress={onDeletePress}
+                            >
+                                <Trash2 size={16} color="#ef4444" />
+                            </TouchableOpacity>
+                        </View>
+                    )}
+                </View>
             </Card.Content>
         </Card>
     );
@@ -127,5 +177,34 @@ const styles = StyleSheet.create({
     locationText: {
         color: '#6366f1',
         flex: 1,
+    },
+    actionsRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginTop: 12,
+        paddingTop: 12,
+        borderTopWidth: 1,
+        borderTopColor: '#e5e7eb',
+    },
+    commentButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+        paddingVertical: 4,
+        paddingHorizontal: 8,
+    },
+    commentCount: {
+        color: '#6b7280',
+    },
+    authorActions: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+    },
+    actionIconButton: {
+        padding: 8,
+        borderRadius: 20,
+        backgroundColor: '#f3f4f6',
     },
 });

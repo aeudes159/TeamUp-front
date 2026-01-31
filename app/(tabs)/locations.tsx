@@ -1,10 +1,12 @@
-import { View, StyleSheet } from 'react-native';
-import { Screen } from '@/components/layout/Screen';
-import { Appbar, Menu, Button, Searchbar, Text } from 'react-native-paper';
-import { LocationList } from '@/components/location/LocationList';
-import { useLocations } from '@/hooks/useLocations';
-import type { Location } from '@/types';
 import { useState } from 'react';
+import { View, StyleSheet, Alert } from 'react-native';
+import { Screen } from '@/components/layout/Screen';
+import { Appbar, Menu, Button, Searchbar, Text, FAB } from 'react-native-paper';
+import { LocationList } from '@/components/location/LocationList';
+import { CreateLocationModal } from '@/components/location/CreateLocationModal';
+import { EditLocationModal } from '@/components/location/EditLocationModal';
+import { useLocations, useCreateLocation, useUpdateLocation, useDeleteLocation } from '@/hooks/useLocations';
+import type { Location, NewLocation } from '@/types';
 import { LocationSort } from '@/types/api';
 
 export default function EventsScreen() {
@@ -13,6 +15,9 @@ export default function EventsScreen() {
     const [maxPrice, setMaxPrice] = useState<number | undefined>(undefined);
     const [sort, setSort] = useState<LocationSort>('NAME');
     const [sortMenuVisible, setSortMenuVisible] = useState(false);
+    const [showCreateModal, setShowCreateModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
 
     const { data, isLoading, error } = useLocations({
         page: 0,
@@ -23,8 +28,72 @@ export default function EventsScreen() {
         sort,
     });
 
+    const createLocation = useCreateLocation();
+    const updateLocation = useUpdateLocation();
+    const deleteLocation = useDeleteLocation();
+
     const handleLocationPress = (location: Location) => {
         console.log('Location clicked:', location.id);
+    };
+
+    const handleCreateLocation = (newLocation: NewLocation) => {
+        createLocation.mutate(newLocation, {
+            onSuccess: () => {
+                setShowCreateModal(false);
+            },
+            onError: (error) => {
+                Alert.alert('Erreur', 'Impossible de créer le lieu. Veuillez réessayer.');
+                console.error('Create location error:', error);
+            },
+        });
+    };
+
+    const handleEditLocation = (location: Location) => {
+        setSelectedLocation(location);
+        setShowEditModal(true);
+    };
+
+    const handleUpdateLocation = (locationId: number, updates: Partial<NewLocation>) => {
+        updateLocation.mutate(
+            { id: locationId, ...updates },
+            {
+                onSuccess: () => {
+                    setShowEditModal(false);
+                    setSelectedLocation(null);
+                },
+                onError: (error) => {
+                    Alert.alert('Erreur', 'Impossible de modifier le lieu. Veuillez réessayer.');
+                    console.error('Update location error:', error);
+                },
+            }
+        );
+    };
+
+    const handleDeleteLocation = (location: Location) => {
+        Alert.alert(
+            'Supprimer le lieu',
+            `Êtes-vous sûr de vouloir supprimer "${location.name || 'ce lieu'}" ?`,
+            [
+                {
+                    text: 'Annuler',
+                    style: 'cancel',
+                },
+                {
+                    text: 'Supprimer',
+                    style: 'destructive',
+                    onPress: () => {
+                        if (location.id) {
+                            deleteLocation.mutate(location.id, {
+                                onError: (error) => {
+                                    Alert.alert('Erreur', 'Impossible de supprimer le lieu. Veuillez réessayer.');
+                                    console.error('Delete location error:', error);
+                                },
+                            });
+                        }
+                    },
+                },
+            ]
+        );
     };
 
     const getPriceLabel = () => {
@@ -39,7 +108,6 @@ export default function EventsScreen() {
         <Screen scrollable={false}>
             <Appbar.Header>
                 <Appbar.Content title="Événements" />
-                <Appbar.Action icon="plus" onPress={() => {}} />
             </Appbar.Header>
 
             <View style={styles.filtersContainer}>
@@ -156,11 +224,41 @@ export default function EventsScreen() {
                 )}
 
                 <LocationList
-                    locations={data?.data ?? []}
+                    locations={data ?? []}
                     isLoading={isLoading}
                     onLocationPress={handleLocationPress}
+                    onEditLocation={handleEditLocation}
+                    onDeleteLocation={handleDeleteLocation}
                 />
             </View>
+
+            {/* FAB for creating new location */}
+            <FAB
+                icon="plus"
+                style={styles.fab}
+                onPress={() => setShowCreateModal(true)}
+                color="#ffffff"
+            />
+
+            {/* Create Location Modal */}
+            <CreateLocationModal
+                visible={showCreateModal}
+                onClose={() => setShowCreateModal(false)}
+                onCreateLocation={handleCreateLocation}
+                isLoading={createLocation.isPending}
+            />
+
+            {/* Edit Location Modal */}
+            <EditLocationModal
+                visible={showEditModal}
+                onClose={() => {
+                    setShowEditModal(false);
+                    setSelectedLocation(null);
+                }}
+                onUpdateLocation={handleUpdateLocation}
+                isLoading={updateLocation.isPending}
+                location={selectedLocation}
+            />
         </Screen>
     );
 }
@@ -229,5 +327,11 @@ const styles = StyleSheet.create({
     errorText: {
         color: '#dc2626',
         textAlign: 'center',
+    },
+    fab: {
+        position: 'absolute',
+        right: 16,
+        bottom: 16,
+        backgroundColor: '#6366f1',
     },
 });

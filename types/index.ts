@@ -53,6 +53,10 @@ export type {
   ReactionResponse,
   ReactionCreateRequest,
   ReactionListResponse,
+  CommentResponse,
+  CommentCreateRequest,
+  CommentUpdateRequest,
+  CommentListResponse,
   PollCreateRequest,
   PollUpdateRequest,
   PollOptionCreateRequest,
@@ -282,14 +286,34 @@ export type Reaction = {
   id: number | null;
   emoji: string;
   userId: number;
-  messageId: number;
+  messageId: number | null;
+  commentId: number | null;
   createdAt: string | null;
 };
 
 export type NewReaction = {
   emoji: string;
   userId: number;
-  messageId: number;
+  messageId?: number;
+  commentId?: number;
+};
+
+// ============================================
+// Comment Types (aligned with backend CommentResponse)
+// ============================================
+
+export type Comment = {
+  id: number | null;
+  content: string;
+  authorId: number;
+  postId: number;
+  createdAt: string | null;
+};
+
+export type NewComment = {
+  content: string;
+  authorId: number;
+  postId: number;
 };
 
 // ============================================

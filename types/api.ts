@@ -291,18 +291,44 @@ export type GroupMemberListResponse = PaginatedResponse<GroupMemberResponse>;
 export type ReactionCreateRequest = {
   emoji: string;
   userId: number;
-  messageId: number;
+  messageId?: number;
+  commentId?: number;
 };
 
 export type ReactionResponse = {
   id: number | null;
   emoji: string;
   userId: number;
-  messageId: number;
+  messageId: number | null;
+  commentId: number | null;
   createdAt: string | null;
 };
 
 export type ReactionListResponse = PaginatedResponse<ReactionResponse>;
+
+// ============================================
+// Comment Types (matches CommentDto.kt)
+// ============================================
+
+export type CommentCreateRequest = {
+  content: string;
+  authorId: number;
+  postId: number;
+};
+
+export type CommentUpdateRequest = {
+  content?: string;
+};
+
+export type CommentResponse = {
+  id: number | null;
+  content: string;
+  authorId: number;
+  postId: number;
+  createdAt: string | null;
+};
+
+export type CommentListResponse = PaginatedResponse<CommentResponse>;
 
 // ============================================
 // Poll Types (matches PollDto.kt)

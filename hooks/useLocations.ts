@@ -7,12 +7,12 @@ import {
     NewLocation,
     PaginationParams,
 } from '@/types';
-import {LocationQueryParams} from "@/types/api";
+import { LocationQueryParams } from "@/types/api";
 
 /**
- * Fetch all locations with pagination
+ * Fetch all locations with pagination and filters
  */
-export function useLocations(params: PaginationParams = { page: 0, size: 20 }) {
+export function useLocations(params: LocationQueryParams = { page: 0, size: 20 }) {
   return useQuery({
     queryKey: ['locations', params],
     queryFn: async () => {

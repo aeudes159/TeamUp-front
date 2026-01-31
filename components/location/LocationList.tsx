@@ -6,12 +6,16 @@ import type { Location } from '@/types';
 type LocationListProps = {
     locations: Location[];
     onLocationPress?: (location: Location) => void;
+    onEditLocation?: (location: Location) => void;
+    onDeleteLocation?: (location: Location) => void;
     isLoading?: boolean;
 };
 
 export function LocationList({
                                  locations,
                                  onLocationPress,
+                                 onEditLocation,
+                                 onDeleteLocation,
                                  isLoading = false,
                              }: Readonly<LocationListProps>) {
 
@@ -47,6 +51,8 @@ export function LocationList({
                 <LocationCard
                     location={item}
                     onPress={() => onLocationPress?.(item)}
+                    onEdit={onEditLocation ? () => onEditLocation(item) : undefined}
+                    onDelete={onDeleteLocation ? () => onDeleteLocation(item) : undefined}
                 />
             )}
             contentContainerStyle={styles.listContent}
