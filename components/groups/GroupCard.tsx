@@ -10,13 +10,13 @@ export function GroupCard({ group, onPress }: Readonly<GroupCardProps>) {
                     {group.coverPictureUrl ? (
                         <Avatar.Image
                             source={{ uri: group.coverPictureUrl }}
-                            size={40}
+                            size={60}
                             style={styles.avatar}
                         />
                     ) : (
                         <Avatar.Icon
                             icon="account-group"
-                            size={40}
+                            size={60}
                             style={styles.avatar}
                         />
                     )}
