@@ -4,15 +4,16 @@
  * Demonstrates the reusable hook pattern for Group entities.
  */
 
-import { useQuery } from '@tanstack/react-query';
+import {useMutation, useQuery} from '@tanstack/react-query';
 import { createCrudHooks } from '@/lib/createCrudHooks';
-import { apiGet, buildQueryString } from '@/lib/api';
-import type { 
-    Group, 
+import {apiGet, apiPost, buildQueryString} from '@/lib/api';
+import type {
+    Group,
     NewGroup,
     GroupListResponse,
-    PaginationParams,
+    PaginationParams, GroupCreateRequest, GroupResponse,
 } from '@/types';
+import {queryClient} from "@/lib/queryClient";
 
 // ============================================
 // Create CRUD Hooks using Factory
@@ -45,8 +46,16 @@ export const useGroup = groupHooks.useById;
 /**
  * Create a new group
  */
-export const useCreateGroup = groupHooks.useCreate;
-
+export function useCreateGroup() {
+    return useMutation({
+        mutationFn: async (newGroup: GroupCreateRequest) => {
+            return await apiPost<GroupResponse>('/api/groups', newGroup);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['groups'], exact: false });
+        },
+    });
+}
 /**
  * Update an existing group
  */

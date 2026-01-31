@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView, Animated, TouchableOpacity, Dimensions } from 'react-native';
 import { Screen } from '@/components/layout/Screen';
 import { Input } from '@/components/ui/Input';
-import { Button } from '@/components/ui/Button';
-import { Appbar, Text, Surface } from 'react-native-paper';
+import { Text, Surface } from 'react-native-paper';
 import { router } from 'expo-router';
 import { GroupAvatarPicker } from './GroupAvatarPicker';
 import { GroupTypeSelector } from './GroupTypeSelector';
 import { ParticipantSelector } from './ParticipantSelector';
+import {useCreateGroup} from "@/hooks/useGroups";
 
 type Participant = {
     id: string;
@@ -30,18 +30,14 @@ export default function CreateGroupScreen() {
         extrapolate: 'clamp',
     });
 
+    const { mutate: createGroup } = useCreateGroup();
+
     const handleCreateGroup = () => {
-        if (!groupName.trim()) {
-            return;
-        }
-        
-        console.log('Creating group:', { 
-            name: groupName, 
-            avatar: groupAvatar,
-            type: groupType,
-            participants: participants
+        createGroup({
+            name: groupName,
+            coverPictureUrl: groupAvatar,
+            isPublic: groupType == 'public',
         });
-        
         router.back();
     };
 
