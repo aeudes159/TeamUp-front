@@ -43,6 +43,13 @@ export type {
   LocationCreateRequest,
   LocationUpdateRequest,
   LocationListResponse,
+  RatingResponse,
+  RatingCreateRequest,
+  RatingUpdateRequest,
+  RatingListResponse,
+  GroupMemberResponse,
+  GroupMemberCreateRequest,
+  GroupMemberListResponse,
 } from './api';
 
 // ============================================
@@ -112,14 +119,14 @@ export type NewMessage = {
 
 export type Discussion = {
   id: number | null;
-  name: string | null;
-  createdAt: string | null;
   groupId: number | null;
+  backgroundImageUrl: string | null;
+  createdAt: string | null;
 };
 
 export type NewDiscussion = {
-  name?: string;
   groupId?: number;
+  backgroundImageUrl?: string;
 };
 
 // ============================================
@@ -186,18 +193,45 @@ export type NewLocation = {
 
 export type Proposal = {
   id: number | null;
-  title: string | null;
-  description: string | null;
-  createdAt: string | null;
   discussionId: number | null;
-  authorId: number | null;
+  createdAt: string | null;
 };
 
 export type NewProposal = {
-  title?: string;
-  description?: string;
   discussionId?: number;
-  authorId?: number;
+};
+
+// ============================================
+// Rating Types (aligned with backend RatingResponse)
+// ============================================
+
+export type Rating = {
+  id: number | null;
+  ratingValue: number | null;
+  userId: number | null;
+  locationId: number | null;
+  createdAt: string | null;
+};
+
+export type NewRating = {
+  ratingValue?: number;
+  userId?: number;
+  locationId?: number;
+};
+
+// ============================================
+// GroupMember Types (aligned with backend GroupMemberResponse)
+// ============================================
+
+export type GroupMember = {
+  groupId: number;
+  userId: number;
+  joinedAt: string | null;
+};
+
+export type NewGroupMember = {
+  groupId: number;
+  userId: number;
 };
 
 // ============================================

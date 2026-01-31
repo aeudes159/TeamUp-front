@@ -74,8 +74,8 @@ export function useCreateDiscussion() {
   return useMutation({
     mutationFn: async (newDiscussion: NewDiscussion) => {
       const response = await apiPost<DiscussionResponse>('/api/discussions', {
-        name: newDiscussion.name,
         groupId: newDiscussion.groupId,
+        backgroundImageUrl: newDiscussion.backgroundImageUrl,
       });
       return response as Discussion;
     },
@@ -100,7 +100,7 @@ export function useUpdateDiscussion() {
       updates 
     }: { 
       id: number; 
-      updates: { name?: string } 
+      updates: { groupId?: number; backgroundImageUrl?: string } 
     }) => {
       const response = await apiPut<DiscussionResponse>(`/api/discussions/${id}`, updates);
       return response as Discussion;

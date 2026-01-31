@@ -107,19 +107,20 @@ export type MessageListResponse = PaginatedResponse<MessageResponse>;
 // ============================================
 
 export type DiscussionCreateRequest = {
-  name?: string;
   groupId?: number;
+  backgroundImageUrl?: string;
 };
 
 export type DiscussionUpdateRequest = {
-  name?: string;
+  groupId?: number;
+  backgroundImageUrl?: string;
 };
 
 export type DiscussionResponse = {
   id: number | null;
-  name: string | null;
-  createdAt: string | null;
   groupId: number | null;
+  backgroundImageUrl: string | null;
+  createdAt: string | null;
 };
 
 export type DiscussionListResponse = PaginatedResponse<DiscussionResponse>;
@@ -183,24 +184,17 @@ export type ActivityFeedWithPostsResponse = {
 // ============================================
 
 export type ProposalCreateRequest = {
-  title?: string;
-  description?: string;
   discussionId?: number;
-  authorId?: number;
 };
 
 export type ProposalUpdateRequest = {
-  title?: string;
-  description?: string;
+  discussionId?: number;
 };
 
 export type ProposalResponse = {
   id: number | null;
-  title: string | null;
-  description: string | null;
-  createdAt: string | null;
   discussionId: number | null;
-  authorId: number | null;
+  createdAt: string | null;
 };
 
 export type ProposalListResponse = PaginatedResponse<ProposalResponse>;
@@ -241,3 +235,44 @@ export type PaginationParams = {
   page?: number;
   size?: number;
 };
+
+// ============================================
+// Rating Types (matches RatingDto.kt)
+// ============================================
+
+export type RatingCreateRequest = {
+  ratingValue?: number;
+  userId?: number;
+  locationId?: number;
+};
+
+export type RatingUpdateRequest = {
+  ratingValue?: number;
+};
+
+export type RatingResponse = {
+  id: number | null;
+  ratingValue: number | null;
+  userId: number | null;
+  locationId: number | null;
+  createdAt: string | null;
+};
+
+export type RatingListResponse = PaginatedResponse<RatingResponse>;
+
+// ============================================
+// GroupMember Types (matches GroupMemberDto.kt)
+// ============================================
+
+export type GroupMemberCreateRequest = {
+  groupId: number;
+  userId: number;
+};
+
+export type GroupMemberResponse = {
+  groupId: number;
+  userId: number;
+  joinedAt: string | null;
+};
+
+export type GroupMemberListResponse = PaginatedResponse<GroupMemberResponse>;
