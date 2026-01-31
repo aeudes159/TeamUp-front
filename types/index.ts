@@ -30,6 +30,11 @@ export type {
   PostCreateRequest,
   PostUpdateRequest,
   PostListResponse,
+  ActivityFeedResponse,
+  ActivityFeedCreateRequest,
+  ActivityFeedUpdateRequest,
+  ActivityFeedListResponse,
+  ActivityFeedWithPostsResponse,
   ProposalResponse,
   ProposalCreateRequest,
   ProposalUpdateRequest,
@@ -118,41 +123,61 @@ export type NewDiscussion = {
 };
 
 // ============================================
-// Event Types (TODO: Backend endpoint coming soon)
-// ============================================
-
-export type Event = {
-  id: string;
-  title: string;
-  description: string;
-  image_url: string;
-  event_date: string;
-  location: string;
-  max_participants: number;
-  created_by: string;
-  created_at: string;
-};
-
-export type NewEvent = Omit<Event, 'id' | 'created_at'>;
-
-// ============================================
 // Post Types (aligned with backend PostResponse)
 // ============================================
 
 export type Post = {
   id: number | null;
-  title: string | null;
   content: string | null;
   imageUrl: string | null;
-  createdAt: string | null;
+  postedAt: string | null;
   authorId: number | null;
+  locationId: number | null;
+  discussionId: number | null;
 };
 
 export type NewPost = {
-  title?: string;
   content?: string;
   imageUrl?: string;
   authorId?: number;
+  locationId?: number;
+  discussionId?: number;
+};
+
+// ============================================
+// ActivityFeed Types (aligned with backend ActivityFeedResponse)
+// ============================================
+
+export type ActivityFeed = {
+  id: number | null;
+};
+
+export type ActivityFeedWithPosts = {
+  id: number | null;
+  posts: Post[];
+};
+
+export type NewActivityFeed = {
+  // ActivityFeed is created empty, posts are added via the join table
+};
+
+// ============================================
+// Location Types (aligned with backend LocationResponse)
+// ============================================
+
+export type Location = {
+  id: number | null;
+  name: string | null;
+  address: string | null;
+  averagePrice: number | null;
+  pictureUrl: string | null;
+};
+
+export type NewLocation = {
+  name?: string;
+  address?: string;
+  averagePrice?: number;
+  pictureUrl?: string;
 };
 
 // ============================================
@@ -179,9 +204,16 @@ export type NewProposal = {
 // Component Props Types
 // ============================================
 
-export type EventCardProps = {
-  event: Event;
+export type PostCardProps = {
+  post: Post;
+  author?: User;
+  location?: Location;
   onPress?: () => void;
+};
+
+export type ActivityFeedListProps = {
+  posts: Post[];
+  onPostPress?: (post: Post) => void;
 };
 
 export type GroupCardProps = {

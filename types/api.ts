@@ -129,28 +129,54 @@ export type DiscussionListResponse = PaginatedResponse<DiscussionResponse>;
 // ============================================
 
 export type PostCreateRequest = {
-  title?: string;
   content?: string;
   imageUrl?: string;
   authorId?: number;
+  locationId?: number;
+  discussionId?: number;
 };
 
 export type PostUpdateRequest = {
-  title?: string;
   content?: string;
   imageUrl?: string;
+  locationId?: number;
 };
 
 export type PostResponse = {
   id: number | null;
-  title: string | null;
   content: string | null;
   imageUrl: string | null;
-  createdAt: string | null;
+  postedAt: string | null;
   authorId: number | null;
+  locationId: number | null;
+  discussionId: number | null;
 };
 
 export type PostListResponse = PaginatedResponse<PostResponse>;
+
+// ============================================
+// ActivityFeed Types (matches ActivityFeedDto.kt)
+// ============================================
+
+export type ActivityFeedCreateRequest = {
+  // ActivityFeed is created empty, posts are added via activity_feed_post
+};
+
+export type ActivityFeedUpdateRequest = {
+  // ActivityFeed updates are handled via the join table
+};
+
+export type ActivityFeedResponse = {
+  id: number | null;
+};
+
+export type ActivityFeedListResponse = PaginatedResponse<ActivityFeedResponse>;
+
+// ActivityFeed with posts (for detailed view)
+export type ActivityFeedWithPostsResponse = {
+  id: number | null;
+  posts: PostResponse[];
+};
 
 // ============================================
 // Proposal Types (matches ProposalDto.kt)
@@ -186,23 +212,23 @@ export type ProposalListResponse = PaginatedResponse<ProposalResponse>;
 export type LocationCreateRequest = {
   name?: string;
   address?: string;
-  latitude?: number;
-  longitude?: number;
+  averagePrice?: number;
+  pictureUrl?: string;
 };
 
 export type LocationUpdateRequest = {
   name?: string;
   address?: string;
-  latitude?: number;
-  longitude?: number;
+  averagePrice?: number;
+  pictureUrl?: string;
 };
 
 export type LocationResponse = {
   id: number | null;
   name: string | null;
   address: string | null;
-  latitude: number | null;
-  longitude: number | null;
+  averagePrice: number | null;
+  pictureUrl: string | null;
 };
 
 export type LocationListResponse = PaginatedResponse<LocationResponse>;
