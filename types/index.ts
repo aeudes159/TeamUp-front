@@ -53,6 +53,16 @@ export type {
   ReactionResponse,
   ReactionCreateRequest,
   ReactionListResponse,
+  PollCreateRequest,
+  PollUpdateRequest,
+  PollOptionCreateRequest,
+  PollVoteCreateRequest,
+  PollVoteResponse,
+  PollOptionResponse,
+  PollResponse,
+  PollListResponse,
+  PollOptionListResponse,
+  PollVoteListResponse,
 } from './api';
 
 // ============================================
@@ -280,4 +290,71 @@ export type NewReaction = {
   emoji: string;
   userId: number;
   messageId: number;
+};
+
+// ============================================
+// Poll Types (aligned with backend PollDto)
+// ============================================
+
+export type Poll = {
+  id: number | null;
+  title: string;
+  description: string | null;
+  discussionId: number | null;
+  creatorId: number | null;
+  createdAt: string | null;
+  isActive: boolean;
+  closedAt: string | null;
+  options: PollOption[];
+  totalVotes: number;
+};
+
+export type PollOption = {
+  id: number | null;
+  pollId: number | null;
+  locationId: number | null;
+  locationName: string | null;
+  locationAddress: string | null;
+  locationPictureUrl: string | null;
+  addedByUserId: number | null;
+  createdAt: string | null;
+  voteCount: number;
+  voters: PollVote[];
+};
+
+export type PollVote = {
+  id: number | null;
+  pollOptionId: number | null;
+  userId: number | null;
+  createdAt: string | null;
+};
+
+export type NewPoll = {
+  title: string;
+  description?: string;
+  discussionId: number;
+  creatorId: number;
+};
+
+export type NewPollOption = {
+  pollId: number;
+  locationId: number;
+  addedByUserId: number;
+};
+
+export type NewPollVote = {
+  pollOptionId: number;
+  userId: number;
+};
+
+// ============================================
+// Poll Component Props Types
+// ============================================
+
+export type PollCardProps = {
+  poll: Poll;
+  currentUserId: number;
+  onVote: (optionId: number) => void;
+  onRemoveVote: (optionId: number) => void;
+  onAddOption: (pollId: number) => void;
 };

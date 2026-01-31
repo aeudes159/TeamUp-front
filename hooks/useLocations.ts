@@ -11,23 +11,45 @@ import {LocationQueryParams} from "@/types/api";
 
 /**
  * Fetch all locations with pagination
- * Falls back to mock data if API fails
  */
-export function useLocations(
-    params: LocationQueryParams = { page: 0, size: 20 }
+export function useLocations(params: PaginationParams = { page: 0, size: 20 }) {
+  return useQuery({
+    queryKey: ['locations', params],
+    queryFn: async () => {
+      const queryString = buildQueryString(params);
+      const response = await apiGet<LocationListResponse>(`/api/locations${queryString}`);
+      return response.data as Location[];
+    },
+  });
+}
+
+/**
+ * Search locations by name
+ *
+ * @param query - The search query
+ * @param params - Pagination parameters
+ * @param enabled - Whether the query should be enabled (default: true if query has content)
+ */
+export function useLocationSearch(
+  query: string,
+  params: PaginationParams = { page: 0, size: 20 },
+  enabled?: boolean
 ) {
-    return useQuery({
-        queryKey: ['locations', params],
-        queryFn: async () => {
-            const queryString = buildQueryString(params);
+  const shouldEnable = enabled !== undefined ? enabled : query.trim().length > 0;
 
-            const response = await apiGet<LocationListResponse>(
-                `/api/locations${queryString}`
-            );
-
-            return response;
-        },
-    });
+  return useQuery({
+    queryKey: ['locations', 'search', query, params],
+    queryFn: async () => {
+      const queryString = buildQueryString({
+        name: query,
+        page: params.page,
+        size: params.size,
+      });
+      const response = await apiGet<LocationListResponse>(`/api/locations/search${queryString}`);
+      return response.data as Location[];
+    },
+    enabled: shouldEnable,
+  });
 }
 
 /**
@@ -37,7 +59,7 @@ export function useLocation(id: number | string | undefined) {
     const numericId = typeof id === 'string' ? parseInt(id, 10) : id;
 
     return useQuery({
-        queryKey: ['locations', numericId],
+        queryKey: ['locations', 'single', numericId],
         queryFn: async () => {
             try {
                 const response = await apiGet<Location>(`/api/locations/${numericId}`);

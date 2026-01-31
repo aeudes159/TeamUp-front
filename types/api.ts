@@ -303,3 +303,68 @@ export type ReactionResponse = {
 };
 
 export type ReactionListResponse = PaginatedResponse<ReactionResponse>;
+
+// ============================================
+// Poll Types (matches PollDto.kt)
+// ============================================
+
+export type PollCreateRequest = {
+  title: string;
+  description?: string;
+  discussionId: number;
+  creatorId: number;
+};
+
+export type PollUpdateRequest = {
+  title?: string;
+  description?: string;
+  isActive?: boolean;
+};
+
+export type PollOptionCreateRequest = {
+  pollId: number;
+  locationId: number;
+  addedByUserId: number;
+};
+
+export type PollVoteCreateRequest = {
+  pollOptionId: number;
+  userId: number;
+};
+
+export type PollVoteResponse = {
+  id: number | null;
+  pollOptionId: number | null;
+  userId: number | null;
+  createdAt: string | null;
+};
+
+export type PollOptionResponse = {
+  id: number | null;
+  pollId: number | null;
+  locationId: number | null;
+  locationName: string | null;
+  locationAddress: string | null;
+  locationPictureUrl: string | null;
+  addedByUserId: number | null;
+  createdAt: string | null;
+  voteCount: number;
+  voters: PollVoteResponse[];
+};
+
+export type PollResponse = {
+  id: number | null;
+  title: string;
+  description: string | null;
+  discussionId: number | null;
+  creatorId: number | null;
+  createdAt: string | null;
+  isActive: boolean;
+  closedAt: string | null;
+  options: PollOptionResponse[];
+  totalVotes: number;
+};
+
+export type PollListResponse = PaginatedResponse<PollResponse>;
+export type PollOptionListResponse = PaginatedResponse<PollOptionResponse>;
+export type PollVoteListResponse = PaginatedResponse<PollVoteResponse>;
