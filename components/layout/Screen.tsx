@@ -2,6 +2,7 @@ import { ScrollView, View, StyleProp, ViewStyle } from 'react-native';
 import { ReactNode } from 'react';
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Surface } from 'react-native-paper';
+import { colors } from '@/constants/theme';
 
 type ScreenProps = {
     children: ReactNode;
@@ -13,9 +14,13 @@ export function Screen({ children, scrollable = true, style }: Readonly<ScreenPr
     const Container = scrollable ? ScrollView : View;
 
     return (
-        <SafeAreaView style={{ flex: 1 }}>
-            <Surface style={{ flex: 1 }}>
-                <Container style={[{ flex: 1 }, style]} contentContainerStyle={scrollable ? { flexGrow: 1 } : undefined}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+            <Surface style={{ flex: 1, backgroundColor: colors.background, elevation: 0 }}>
+                <Container 
+                    style={[{ flex: 1, backgroundColor: colors.background }, style]} 
+                    contentContainerStyle={scrollable ? { flexGrow: 1 } : undefined}
+                    showsVerticalScrollIndicator={false}
+                >
                     {children}
                 </Container>
             </Surface>
