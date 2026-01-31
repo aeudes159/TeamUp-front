@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Image, Pressable, Animated, Dimensions } from 'react-native';
-import { IconButton, Text, Surface } from 'react-native-paper';
+import { View, StyleSheet, Image, Pressable, Animated, Dimensions, TouchableOpacity } from 'react-native';
+import { IconButton, Text } from 'react-native-paper';
 import { ImagePickerButton } from '@/components/chat/ImagePickerButton';
 
 type GroupAvatarPickerProps = {
@@ -55,76 +55,52 @@ export function GroupAvatarPicker({ avatarUrl, onAvatarSelected, disabled }: Rea
 
     return (
         <View style={styles.container}>
-            <Text style={styles.label}>Photo du groupe</Text>
-            
-            <View style={styles.avatarContainer}>
-                <Surface style={styles.avatarSurface} elevation={4}>
-                    <Animated.View
-                        style={[
-                            styles.avatarTouchable,
-                            {
-                                transform: [{ scale: scaleAnim }],
-                            }
-                        ]}
-                    >
-                        <Pressable
-                            onPressIn={handlePressIn}
-                            onPressOut={handlePressOut}
-                            onPress={() => {}}
-                            disabled={disabled}
-                            style={({ pressed }) => [
-                                styles.avatarPressable,
-                                pressed && styles.avatarPressed,
-                                disabled && styles.avatarDisabled,
-                            ]}
-                        >
-                            {avatarUrl ? (
-                                <View style={styles.avatarWrapper}>
-                                    <Image source={{ uri: avatarUrl }} style={styles.avatar} />
-                                    <View style={styles.editOverlay}>
-                                        <ImagePickerButton
-                                            onImageSelected={handleAvatarSelected}
-                                            disabled={disabled}
-                                        />
-                                    </View>
-                                    <Animated.View
-                                        style={[
-                                            styles.successIndicator,
-                                            {
-                                                opacity: opacityAnim,
-                                            }
-                                        ]}
-                                    >
-                                        <Text style={styles.successText}>✓</Text>
-                                    </Animated.View>
-                                </View>
-                            ) : (
-                                <View style={[styles.emptyState, disabled && styles.avatarDisabled]}>
-                                    <View style={styles.iconContainer}>
-                                        <IconButton
-                                            icon="image-plus"
-                                            size={50}
-                                            iconColor="#8F88B8"
-                                            style={styles.emptyIcon}
-                                        />
-                                    </View>
-                                </View>
-                            )}
-                        </Pressable>
-                    </Animated.View>
-                </Surface>
-                
-                {avatarUrl && (
-                    <View style={styles.actionButtons}>
-                        <View style={styles.actionButton}>
-                            <ImagePickerButton
-                                onImageSelected={handleAvatarSelected}
-                                disabled={disabled}
-                            />
+            <TouchableOpacity
+                onPressIn={handlePressIn}
+                onPressOut={handlePressOut}
+                onPress={() => {}}
+                disabled={disabled}
+                activeOpacity={0.8}
+                style={styles.avatarContainer}
+            >
+                <Animated.View
+                    style={[
+                        styles.avatarTouchable,
+                        {
+                            transform: [{ scale: scaleAnim }],
+                        }
+                    ]}
+                >
+                    {avatarUrl ? (
+                        <View style={styles.avatarWrapper}>
+                            <Image source={{ uri: avatarUrl }} style={styles.avatar} />
+                            <View style={styles.editOverlay}>
+                                <ImagePickerButton
+                                    onImageSelected={handleAvatarSelected}
+                                    disabled={disabled}
+                                />
+                            </View>
+                            <Animated.View
+                                style={[
+                                    styles.successIndicator,
+                                    {
+                                        opacity: opacityAnim,
+                                    }
+                                ]}
+                            >
+                                <Text style={styles.successText}>✓</Text>
+                            </Animated.View>
                         </View>
-                    </View>
-                )}
-            </View>
+                    ) : (
+                        <View style={styles.emptyState}>
+                            <View style={styles.emptyIconContainer}>
+                                <Text style={styles.emptyIcon}>📷</Text>
+                            </View>
+                            <Text style={styles.emptyText}>Photo du groupe</Text>
+                        </View>
+                    )}
+                </Animated.View>
+            </TouchableOpacity>
         </View>
     );
 }
@@ -132,38 +108,15 @@ export function GroupAvatarPicker({ avatarUrl, onAvatarSelected, disabled }: Rea
 const styles = StyleSheet.create({
     container: {
         alignItems: 'center',
-        marginBottom: 32,
-    },
-    label: {
-        fontSize: 17,
-        fontFamily: 'System',
-        fontWeight: '600',
-        marginBottom: 20,
-        color: '#F6E6D8',
-        letterSpacing: -0.2,
+        marginBottom: 24,
     },
     avatarContainer: {
         alignItems: 'center',
         justifyContent: 'center',
         position: 'relative',
     },
-    avatarSurface: {
-        backgroundColor: 'transparent',
-        padding: 0,
-        elevation: 0,
-    },
     avatarTouchable: {
         position: 'relative',
-    },
-    avatarPressable: {
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    avatarPressed: {
-        opacity: 0.8,
-    },
-    avatarDisabled: {
-        opacity: 0.4,
     },
     avatarWrapper: {
         position: 'relative',
@@ -171,9 +124,30 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     avatar: {
-        width: 140,
-        height: 140,
-        borderRadius: 70,
+        width: 150,
+        height: 150,
+        borderRadius: 75,
+        borderWidth: 3,
+        borderColor: '#F3D1C8',
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 8,
+        },
+        shadowOpacity: 0.15,
+        shadowRadius: 24,
+        elevation: 12,
+    },
+    editOverlay: {
+        position: 'absolute',
+        bottom: 0,
+        right: 0,
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+        backgroundColor: '#F08A5D',
+        alignItems: 'center',
+        justifyContent: 'center',
         borderWidth: 3,
         borderColor: '#F6E6D8',
         shadowColor: '#000',
@@ -181,113 +155,65 @@ const styles = StyleSheet.create({
             width: 0,
             height: 4,
         },
-        shadowOpacity: 0.08,
-        shadowRadius: 16,
-        elevation: 8,
-    },
-    editOverlay: {
-        position: 'absolute',
-        bottom: -4,
-        right: -4,
-        backgroundColor: '#FFFFFF',
-        borderRadius: 22,
-        width: 44,
-        height: 44,
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderWidth: 2,
-        borderColor: '#8F88B8',
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 4,
-        },
-        shadowOpacity: 0.12,
+        shadowOpacity: 0.2,
         shadowRadius: 12,
         elevation: 8,
     },
     successIndicator: {
         position: 'absolute',
-        top: -8,
-        right: -8,
+        top: -5,
+        right: -5,
+        width: 36,
+        height: 36,
+        borderRadius: 18,
         backgroundColor: '#4CAF50',
-        borderRadius: 20,
-        width: 32,
-        height: 32,
         alignItems: 'center',
         justifyContent: 'center',
         shadowColor: '#000',
         shadowOffset: {
             width: 0,
-            height: 2,
+            height: 4,
         },
-        shadowOpacity: 0.2,
-        shadowRadius: 8,
-        elevation: 6,
+        shadowOpacity: 0.25,
+        shadowRadius: 12,
+        elevation: 8,
     },
     successText: {
         color: '#FFFFFF',
-        fontSize: 16,
+        fontSize: 18,
         fontWeight: 'bold',
     },
     emptyState: {
-        width: 140,
-        height: 140,
-        borderRadius: 70,
-        backgroundColor: '#F6E6D8',
-        borderWidth: 2,
+        width: 150,
+        height: 150,
+        borderRadius: 75,
+        backgroundColor: 'linear-gradient(135deg, #B8A1D9 0%, #F6E6D8 100%)',
+        borderWidth: 3,
         borderColor: '#F3D1C8',
         alignItems: 'center',
         justifyContent: 'center',
         shadowColor: '#000',
         shadowOffset: {
             width: 0,
-            height: 4,
+            height: 8,
         },
-        shadowOpacity: 0.06,
-        shadowRadius: 16,
-        elevation: 8,
+        shadowOpacity: 0.12,
+        shadowRadius: 24,
+        elevation: 10,
     },
-    iconContainer: {
+    emptyIconContainer: {
         marginBottom: 8,
     },
     emptyIcon: {
-        margin: 0,
-        backgroundColor: 'transparent',
+        fontSize: 40,
+        filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.1))',
     },
-    emptyTitle: {
+    emptyText: {
         fontSize: 14,
         fontFamily: 'System',
         fontWeight: '600',
-        color: '#2F2F38',
+        color: '#2E1A47',
         textAlign: 'center',
-        marginBottom: 4,
-    },
-    emptySubtitle: {
-        fontSize: 11,
-        fontFamily: 'System',
-        fontWeight: '400',
-        color: '#9A9AA5',
-        textAlign: 'center',
-        paddingHorizontal: 12,
-        lineHeight: 14,
-    },
-    actionButtons: {
-        position: 'absolute',
-        bottom: -16,
-        flexDirection: 'row',
-        gap: 12,
-    },
-    actionButton: {
-        backgroundColor: '#FFFFFF',
-        borderRadius: 20,
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 4,
-        },
-        shadowOpacity: 0.1,
-        shadowRadius: 12,
-        elevation: 6,
+        letterSpacing: -0.2,
     },
 });
