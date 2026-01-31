@@ -43,6 +43,8 @@ export type {
   LocationCreateRequest,
   LocationUpdateRequest,
   LocationListResponse,
+  LocationSort,
+  LocationQueryParams,
   RatingResponse,
   RatingCreateRequest,
   RatingUpdateRequest,
@@ -181,10 +183,9 @@ export type NewActivityFeed = {
   // ActivityFeed is created empty, posts are added via the join table
 };
 
-// ============================================
-// Location Types (aligned with backend LocationResponse)
-// ============================================
-
+// Note: We don't use `export type { LocationResponse as Location }` because
+// `Location` conflicts with the browser's global Location type in web environments.
+// Instead, we define the type explicitly here, matching LocationResponse from api.ts.
 export type Location = {
   id: number | null;
   name: string | null;

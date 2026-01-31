@@ -1,16 +1,26 @@
+/**
+ * Groups Screen
+ * 
+ * Displays user's groups with elegant animations and styling.
+ * Uses the refactored useGroups hook with proper data access.
+ */
+
 import React, { useState } from 'react';
-import { View, FlatList, StyleSheet, Dimensions, Animated, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Dimensions, Animated, TouchableOpacity } from 'react-native';
 import { Screen } from '@/components/layout/Screen';
 import { GroupCard } from '@/components/groups/GroupCard';
 import { useGroups } from '@/hooks/useGroups';
 import { router } from 'expo-router';
-import { Appbar, ActivityIndicator, Text, Surface, IconButton } from 'react-native-paper';
+import { ActivityIndicator, Text, Surface } from 'react-native-paper';
 
 const { width: screenWidth } = Dimensions.get('window');
 
 export default function GroupsScreen() {
-    const { data: groups, isLoading, error } = useGroups();
+    const { data, isLoading, error, refetch } = useGroups();
     const [scrollY] = useState(new Animated.Value(0));
+
+    // Extract the groups array from the paginated response
+    const groups = data?.data ?? [];
 
     const headerOpacity = scrollY.interpolate({
         inputRange: [0, 100],
@@ -54,11 +64,18 @@ export default function GroupsScreen() {
                             <Text style={styles.errorDetail}>
                                 {error instanceof Error ? error.message : 'Une erreur est survenue'}
                             </Text>
+                            <TouchableOpacity 
+                                onPress={() => refetch()}
+                                style={styles.retryButton}
+                                activeOpacity={0.8}
+                            >
+                                <Text style={styles.retryButtonText}>Réessayer</Text>
+                            </TouchableOpacity>
                         </Surface>
                     </View>
                 )}
 
-                {groups && groups.length === 0 && (
+                {!isLoading && !error && groups.length === 0 && (
                     <View style={styles.centerContent}>
                         <Surface style={styles.emptyCard}>
                             <View style={styles.emptyIconContainer}>
@@ -77,7 +94,7 @@ export default function GroupsScreen() {
                     </View>
                 )}
 
-                {groups && groups.length > 0 && (
+                {!isLoading && !error && groups.length > 0 && (
                     <Animated.FlatList
                         data={groups}
                         keyExtractor={(item) => String(item.id)}
@@ -236,6 +253,20 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         lineHeight: 22,
         letterSpacing: 0.1,
+        marginBottom: 20,
+    },
+    retryButton: {
+        borderRadius: 16,
+        backgroundColor: '#F08A5D',
+        paddingHorizontal: 24,
+        paddingVertical: 12,
+    },
+    retryButtonText: {
+        fontSize: 14,
+        fontFamily: 'System',
+        fontWeight: '600',
+        color: '#FFFFFF',
+        letterSpacing: 0.3,
     },
     emptyCard: {
         borderRadius: 28,

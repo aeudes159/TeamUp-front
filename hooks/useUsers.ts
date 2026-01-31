@@ -1,139 +1,103 @@
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { apiGet, apiPost, apiPut, apiDelete, buildQueryString } from '@/lib/api';
-import { queryClient } from '@/lib/queryClient';
+/**
+ * User Hooks - Refactored using createCrudHooks factory
+ * 
+ * Demonstrates the reusable hook pattern for User entities.
+ */
+
+import { useQuery } from '@tanstack/react-query';
+import { createCrudHooks, createSearchHook } from '@/lib/createCrudHooks';
+import { apiGet, buildQueryString } from '@/lib/api';
 import type { 
-  User, 
-  NewUser,
-  UserListResponse,
-  UserResponse,
-  PaginationParams 
+    User, 
+    NewUser,
+    UserListResponse,
+    UserResponse,
+    PaginationParams 
 } from '@/types';
+
+// ============================================
+// Create CRUD Hooks using Factory
+// ============================================
+
+const userHooks = createCrudHooks<User, NewUser, UserListResponse>({
+    resourceName: 'users',
+    endpoint: '/api/users',
+});
+
+// ============================================
+// Export Individual Hooks
+// ============================================
 
 /**
  * Fetch all users with pagination
+ * 
+ * @param params - Pagination parameters
+ * @returns Query result with UserListResponse
  */
 export function useUsers(params: PaginationParams = { page: 0, size: 20 }) {
-  return useQuery({
-    queryKey: ['users', params],
-    queryFn: async () => {
-      const queryString = buildQueryString({
-        page: params.page,
-        size: params.size,
-      });
-      const response = await apiGet<UserListResponse>(`/api/users${queryString}`);
-      return response.data as User[];
-    },
-  });
-}
-
-/**
- * Search users by name
- */
-export function useSearchUsers(
-  name: string,
-  params: PaginationParams = { page: 0, size: 20 }
-) {
-  return useQuery({
-    queryKey: ['users', 'search', name, params],
-    queryFn: async () => {
-      const queryString = buildQueryString({
-        name,
-        page: params.page,
-        size: params.size,
-      });
-      const response = await apiGet<UserListResponse>(`/api/users/search${queryString}`);
-      return response.data as User[];
-    },
-    enabled: !!name && name.length > 0,
-  });
+    return userHooks.useList(params);
 }
 
 /**
  * Fetch a single user by ID
  */
-export function useUser(id: number | string | undefined) {
-  const numericId = typeof id === 'string' ? parseInt(id, 10) : id;
-
-  return useQuery({
-    queryKey: ['users', numericId],
-    queryFn: async () => {
-      const response = await apiGet<UserResponse>(`/api/users/${numericId}`);
-      return response as User;
-    },
-    enabled: !!numericId && !isNaN(numericId),
-  });
-}
-
-/**
- * Fetch user by phone number
- */
-export function useUserByPhoneNumber(phoneNumber: string | undefined) {
-  return useQuery({
-    queryKey: ['users', 'phone', phoneNumber],
-    queryFn: async () => {
-      const queryString = buildQueryString({ phoneNumber: phoneNumber! });
-      const response = await apiGet<UserResponse>(`/api/users/by-phone${queryString}`);
-      return response as User;
-    },
-    enabled: !!phoneNumber,
-  });
-}
+export const useUser = userHooks.useById;
 
 /**
  * Create a new user
  */
-export function useCreateUser() {
-  return useMutation({
-    mutationFn: async (newUser: NewUser) => {
-      const response = await apiPost<UserResponse>('/api/users', {
-        firstName: newUser.firstName,
-        lastName: newUser.lastName,
-        age: newUser.age,
-        phoneNumber: newUser.phoneNumber,
-        address: newUser.address,
-        profilePictureUrl: newUser.profilePictureUrl,
-      });
-      return response as User;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['users'] });
-    },
-  });
-}
+export const useCreateUser = userHooks.useCreate;
 
 /**
  * Update an existing user
  */
-export function useUpdateUser() {
-  return useMutation({
-    mutationFn: async ({ id, updates }: { id: number; updates: Partial<NewUser> }) => {
-      const response = await apiPut<UserResponse>(`/api/users/${id}`, {
-        firstName: updates.firstName,
-        lastName: updates.lastName,
-        age: updates.age,
-        phoneNumber: updates.phoneNumber,
-        address: updates.address,
-        profilePictureUrl: updates.profilePictureUrl,
-      });
-      return response as User;
-    },
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['users'] });
-      queryClient.invalidateQueries({ queryKey: ['users', variables.id] });
-    },
-  });
-}
+export const useUpdateUser = userHooks.useUpdate;
 
 /**
  * Delete a user
  */
-export function useDeleteUser() {
-  return useMutation({
-    mutationFn: async (id: number) => {
-      await apiDelete(`/api/users/${id}`);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['users'] });
-    },
-  });
+export const useDeleteUser = userHooks.useDelete;
+
+// ============================================
+// Custom Hooks (domain-specific, not part of factory)
+// ============================================
+
+/**
+ * Search users by name
+ * 
+ * @param name - The search query
+ * @param params - Pagination parameters
+ * @returns Query result with users matching the search
+ */
+export const useSearchUsers = createSearchHook<User, UserListResponse>({
+    resourceName: 'users',
+    endpoint: '/api/users',
+    searchParam: 'name',
+});
+
+/**
+ * Fetch user by phone number
+ * 
+ * This is a custom endpoint not covered by the factory.
+ */
+export function useUserByPhoneNumber(phoneNumber: string | undefined) {
+    return useQuery({
+        queryKey: ['users', 'phone', phoneNumber],
+        queryFn: async () => {
+            const queryString = buildQueryString({ phoneNumber: phoneNumber! });
+            const response = await apiGet<UserResponse>(`/api/users/by-phone${queryString}`);
+            return response as User;
+        },
+        enabled: !!phoneNumber,
+    });
 }
+
+// ============================================
+// Utility Exports
+// ============================================
+
+/** Get query key for users */
+export const getUsersQueryKey = userHooks.getQueryKey;
+
+/** Invalidate all user queries */
+export const invalidateUserQueries = userHooks.invalidateAll;

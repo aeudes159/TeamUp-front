@@ -2,6 +2,7 @@ import { View, StyleSheet } from 'react-native';
 import { Image } from 'expo-image';
 import { Card, Text, Avatar } from 'react-native-paper';
 import { MapPin, Clock } from 'lucide-react-native';
+import { formatDate, getFullName } from '@/lib/utils';
 import type { Post, User, Location, PostCardProps } from '@/types';
 
 export function PostCard({
@@ -10,24 +11,6 @@ export function PostCard({
     location,
     onPress,
 }: Readonly<PostCardProps>) {
-    const formatDate = (dateString: string | null) => {
-        if (!dateString) return '';
-        const date = new Date(dateString);
-        return date.toLocaleDateString('fr-FR', {
-            day: 'numeric',
-            month: 'long',
-            hour: '2-digit',
-            minute: '2-digit',
-        });
-    };
-
-    const getAuthorName = () => {
-        if (author) {
-            return `${author.firstName ?? ''} ${author.lastName ?? ''}`.trim() || 'Utilisateur';
-        }
-        return 'Utilisateur';
-    };
-
     const getAuthorAvatar = () => {
         return author?.profilePictureUrl ?? 'https://i.pravatar.cc/150?img=1';
     };
@@ -42,7 +25,7 @@ export function PostCard({
                 />
                 <View style={styles.authorInfo}>
                     <Text variant="titleSmall" style={styles.authorName}>
-                        {getAuthorName()}
+                        {getFullName(author?.firstName, author?.lastName)}
                     </Text>
                     <View style={styles.dateRow}>
                         <Clock size={12} color="#6b7280" />

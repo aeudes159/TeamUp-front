@@ -1,129 +1,140 @@
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { apiGet, apiPost, apiPut, apiDelete, buildQueryString } from '@/lib/api';
-import { queryClient } from '@/lib/queryClient';
+/**
+ * Location Hooks - Refactored using createCrudHooks factory
+ * 
+ * This demonstrates the new pattern that reduces hook code by ~80%.
+ * The factory handles all the boilerplate for CRUD operations.
+ */
+
+import { createCrudHooks, createSearchHook } from '@/lib/createCrudHooks';
 import { mockLocations } from '@/mock/data';
-import {
-    Location, LocationListResponse,
+import type {
+    Location,
     NewLocation,
-    PaginationParams,
+    LocationListResponse,
+    LocationResponse,
+    LocationQueryParams,
 } from '@/types';
-import {LocationQueryParams} from "@/types/api";
+
+// ============================================
+// Response Transformer (handles BigDecimal → number)
+// ============================================
 
 /**
- * Fetch all locations with pagination
+ * Parse location response to ensure averagePrice is a number.
+ * Backend uses BigDecimal which may serialize as string.
  */
-export function useLocations(params: PaginationParams = { page: 0, size: 20 }) {
-  return useQuery({
-    queryKey: ['locations', params],
-    queryFn: async () => {
-      const queryString = buildQueryString(params);
-      const response = await apiGet<LocationListResponse>(`/api/locations${queryString}`);
-      return response.data as Location[];
-    },
-  });
+function parseLocationResponse(location: LocationResponse): LocationResponse {
+    return {
+        ...location,
+        averagePrice: location.averagePrice !== null
+            ? Number(location.averagePrice)
+            : null,
+    };
 }
 
-/**
- * Search locations by name
- *
- * @param query - The search query
- * @param params - Pagination parameters
- * @param enabled - Whether the query should be enabled (default: true if query has content)
- */
-export function useLocationSearch(
-  query: string,
-  params: PaginationParams = { page: 0, size: 20 },
-  enabled?: boolean
-) {
-  const shouldEnable = enabled !== undefined ? enabled : query.trim().length > 0;
+// ============================================
+// Create CRUD Hooks using Factory
+// ============================================
 
-  return useQuery({
-    queryKey: ['locations', 'search', query, params],
-    queryFn: async () => {
-      const queryString = buildQueryString({
-        name: query,
-        page: params.page,
-        size: params.size,
-      });
-      const response = await apiGet<LocationListResponse>(`/api/locations/search${queryString}`);
-      return response.data as Location[];
-    },
-    enabled: shouldEnable,
-  });
+const locationHooks = createCrudHooks<Location, NewLocation, LocationListResponse>({
+    resourceName: 'locations',
+    endpoint: '/api/locations',
+    transformResponse: parseLocationResponse,
+});
+
+// ============================================
+// Export Individual Hooks
+// ============================================
+
+/**
+ * Fetch all locations with pagination and optional filters
+ * 
+ * @param params - Query parameters including pagination and filters
+ * @returns Query result with LocationListResponse
+ * 
+ * @example
+ * const { data, isLoading } = useLocations({ page: 0, size: 20, sort: 'NAME' });
+ */
+export function useLocations(params: LocationQueryParams = { page: 0, size: 20 }) {
+    return locationHooks.useList(params);
 }
 
 /**
  * Fetch a single location by ID
+ * 
+ * @param id - Location ID (string or number)
+ * @returns Query result with Location
+ * 
+ * @example
+ * const { data: location } = useLocation(123);
  */
-export function useLocation(id: number | string | undefined) {
-    const numericId = typeof id === 'string' ? parseInt(id, 10) : id;
-
-    return useQuery({
-        queryKey: ['locations', 'single', numericId],
-        queryFn: async () => {
-            try {
-                const response = await apiGet<Location>(`/api/locations/${numericId}`);
-                return response as Location;
-            } catch (error) {
-                console.warn('Failed to fetch location from API, using mock data:', error);
-                const location = mockLocations.find(l => l.id === numericId);
-                if (!location) {
-                    throw new Error(`Location with id ${numericId} not found`);
-                }
-                return location as Location;
-            }
-        },
-        enabled: !!numericId && !isNaN(numericId),
-    });
-}
+export const useLocation = locationHooks.useById;
 
 /**
  * Create a new location
+ * 
+ * @returns Mutation for creating a location
+ * 
+ * @example
+ * const { mutate: createLocation } = useCreateLocation();
+ * createLocation({ name: 'New Place', address: '123 Street' });
  */
-export function useCreateLocation() {
-    return useMutation({
-        mutationFn: async (newLocation: NewLocation) => {
-            const response = await apiPost<Location>('/api/locations', newLocation);
-            return response as Location;
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['locations'] });
-        },
-    });
-}
+export const useCreateLocation = locationHooks.useCreate;
 
 /**
  * Update an existing location
+ * 
+ * @returns Mutation for updating a location
+ * 
+ * @example
+ * const { mutate: updateLocation } = useUpdateLocation();
+ * updateLocation({ id: 1, name: 'Updated Name' });
  */
-export function useUpdateLocation() {
-    return useMutation({
-        mutationFn: async ({
-                               id,
-                               ...updates
-                           }: { id: number } & Partial<NewLocation>) => {
-            const response = await apiPut<Location>(
-                `/api/locations/${id}`,
-                updates
-            );
-            return response as Location;
-        },
-        onSuccess: (_, variables) => {
-            queryClient.invalidateQueries({ queryKey: ['locations'] });
-            queryClient.invalidateQueries({ queryKey: ['locations', variables.id] });
-        },
-    });
-}
+export const useUpdateLocation = locationHooks.useUpdate;
 
 /**
  * Delete a location
+ * 
+ * @returns Mutation for deleting a location
+ * 
+ * @example
+ * const { mutate: deleteLocation } = useDeleteLocation();
+ * deleteLocation(123);
  */
-export function useDeleteLocation() {
-    return useMutation({
-        mutationFn: async (id: number) => {
-            await apiDelete(`/api/locations/${id}`);
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['locations'] });
-        },
-    });
-}
+export const useDeleteLocation = locationHooks.useDelete;
+
+// ============================================
+// Search Hook (custom implementation for location search)
+// ============================================
+
+/**
+ * Search locations by name with debounce support
+ *
+ * @param query - The search query
+ * @param params - Pagination parameters
+ * @param enabled - Whether the query should be enabled
+ * @returns Query result with LocationListResponse
+ * 
+ * @example
+ * const debouncedQuery = useDebouncedValue(searchQuery, 300);
+ * const { data } = useLocationSearch(debouncedQuery);
+ */
+export const useLocationSearch = createSearchHook<Location, LocationListResponse>({
+    resourceName: 'locations',
+    endpoint: '/api/locations',
+    searchParam: 'name',
+    transformResponse: parseLocationResponse,
+});
+
+// ============================================
+// Utility Exports
+// ============================================
+
+/** Get query key for locations (useful for cache invalidation) */
+export const getLocationsQueryKey = locationHooks.getQueryKey;
+
+/** Invalidate all location queries */
+export const invalidateLocationQueries = locationHooks.invalidateAll;
+
+/** Export mock data for fallback scenarios */
+export { mockLocations };

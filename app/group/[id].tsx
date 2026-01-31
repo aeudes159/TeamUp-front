@@ -43,11 +43,14 @@ export default function GroupChatScreen() {
     const { data: group, isLoading: groupLoading } = useGroup(groupId);
 
     // Fetch discussions for this group
-    const { data: discussions, isLoading: discussionsLoading } = useGroupDiscussions(groupId);
+    const { data: discussionsData, isLoading: discussionsLoading } = useGroupDiscussions(groupId);
+
+    // Extract the discussions array from the paginated response
+    const discussions = discussionsData?.data ?? [];
 
     // Set the first discussion as the active one (or create one if none exists)
     useEffect(() => {
-        if (discussions && discussions.length > 0 && discussions[0].id) {
+        if (discussions.length > 0 && discussions[0].id) {
             setDiscussionId(discussions[0].id);
         }
     }, [discussions]);

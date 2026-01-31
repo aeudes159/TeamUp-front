@@ -1,6 +1,13 @@
-import { FlatList, View, StyleSheet } from 'react-native';
-import { Text, ActivityIndicator } from 'react-native-paper';
+/**
+ * FeedList Component - Refactored to use shared state components
+ * 
+ * Uses ListWrapper for loading/empty states and shared utilities.
+ */
+
+import { FlatList, StyleSheet } from 'react-native';
+import { FileText } from 'lucide-react-native';
 import { PostCard } from './PostCard';
+import { ListWrapper } from '@/components/ui/StateComponents';
 import { mockUsers, mockLocations } from '@/mock/data';
 import type { Post, User, Location } from '@/types';
 
@@ -10,6 +17,8 @@ type FeedListProps = {
     locations?: Location[];
     onPostPress?: (post: Post) => void;
     isLoading?: boolean;
+    error?: Error | null;
+    onRetry?: () => void;
 };
 
 export function FeedList({ 
@@ -18,6 +27,8 @@ export function FeedList({
     locations = mockLocations,
     onPostPress,
     isLoading = false,
+    error = null,
+    onRetry,
 }: Readonly<FeedListProps>) {
     // Helper to find author by ID
     const findAuthor = (authorId: number | null): User | undefined => {
@@ -31,74 +42,35 @@ export function FeedList({
         return locations.find(l => l.id === locationId);
     };
 
-    if (isLoading) {
-        return (
-            <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" />
-                <Text variant="bodyMedium" style={styles.loadingText}>
-                    Chargement des posts...
-                </Text>
-            </View>
-        );
-    }
-
-    if (posts.length === 0) {
-        return (
-            <View style={styles.emptyContainer}>
-                <Text variant="bodyLarge" style={styles.emptyText}>
-                    Aucun post pour le moment
-                </Text>
-                <Text variant="bodyMedium" style={styles.emptySubtext}>
-                    Soyez le premier a partager une activite !
-                </Text>
-            </View>
-        );
-    }
-
     return (
-        <FlatList
-            data={posts}
-            keyExtractor={(item) => String(item.id)}
-            renderItem={({ item }) => (
-                <PostCard
-                    post={item}
-                    author={findAuthor(item.authorId)}
-                    location={findLocation(item.locationId)}
-                    onPress={() => onPostPress?.(item)}
-                />
-            )}
-            contentContainerStyle={styles.listContent}
-        />
+        <ListWrapper
+            isLoading={isLoading}
+            error={error}
+            isEmpty={posts.length === 0}
+            loadingMessage="Chargement des posts..."
+            emptyTitle="Aucun post pour le moment"
+            emptySubtitle="Soyez le premier à partager une activité !"
+            emptyIcon={<FileText size={48} color="#d1d5db" />}
+            onRetry={onRetry}
+        >
+            <FlatList
+                data={posts}
+                keyExtractor={(item) => String(item.id)}
+                renderItem={({ item }) => (
+                    <PostCard
+                        post={item}
+                        author={findAuthor(item.authorId)}
+                        location={findLocation(item.locationId)}
+                        onPress={() => onPostPress?.(item)}
+                    />
+                )}
+                contentContainerStyle={styles.listContent}
+            />
+        </ListWrapper>
     );
 }
 
 const styles = StyleSheet.create({
-    loadingContainer: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 32,
-    },
-    loadingText: {
-        marginTop: 16,
-        color: '#6b7280',
-    },
-    emptyContainer: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 32,
-    },
-    emptyText: {
-        textAlign: 'center',
-        color: '#374151',
-        fontWeight: '600',
-    },
-    emptySubtext: {
-        textAlign: 'center',
-        color: '#6b7280',
-        marginTop: 8,
-    },
     listContent: {
         flexGrow: 1,
         paddingBottom: 16,

@@ -7,7 +7,10 @@ import { router } from 'expo-router';
 import type { Post } from '@/types';
 
 export default function FeedScreen() {
-    const { data: posts, isLoading, error } = usePosts();
+    const { data, isLoading, error } = usePosts();
+
+    // Extract the posts array from the paginated response
+    const posts = data?.data ?? [];
 
     const handlePostPress = (post: Post) => {
         console.log('Post clicked:', post.id);
@@ -31,7 +34,7 @@ export default function FeedScreen() {
                     </View>
                 )}
                 <FeedList
-                    posts={posts ?? []}
+                    posts={posts}
                     onPostPress={handlePostPress}
                     isLoading={isLoading}
                 />

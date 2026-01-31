@@ -10,7 +10,7 @@ import {
   Platform,
 } from 'react-native';
 import { Text, Searchbar, Surface, ActivityIndicator, IconButton } from 'react-native-paper';
-import { MapPin, DollarSign } from 'lucide-react-native';
+import {MapPin, Euro} from 'lucide-react-native';
 import { useLocationSearch, useLocations } from '@/hooks/useLocations';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import type { Location } from '@/types';
@@ -54,10 +54,10 @@ function LocationItem({ location, onSelect }: Readonly<LocationItemProps>) {
         )}
         {location.averagePrice !== null && (
           <View style={styles.priceRow}>
-            <DollarSign size={12} color="#10b981" />
             <Text variant="bodySmall" style={styles.locationPrice}>
-              Avg. ${location.averagePrice}
+              {location.averagePrice}
             </Text>
+            <Euro size={12} color="#10b981" />
           </View>
         )}
       </View>
@@ -85,7 +85,8 @@ export function LocationSearchDrawer({
     isLoading: isLoadingAll,
   } = useLocations({ page: 0, size: 50 });
 
-  const locations = debouncedQuery.trim() ? searchResults : allLocations;
+  // Extract the data array from the response (hooks now return LocationListResponse)
+  const locations = debouncedQuery.trim() ? searchResults?.data : allLocations?.data;
   const isLoading = debouncedQuery.trim() ? isSearching : isLoadingAll;
 
   const handleSelectLocation = (location: Location) => {
