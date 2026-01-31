@@ -50,6 +50,9 @@ export type {
   GroupMemberResponse,
   GroupMemberCreateRequest,
   GroupMemberListResponse,
+  ReactionResponse,
+  ReactionCreateRequest,
+  ReactionListResponse,
 } from './api';
 
 // ============================================
@@ -260,4 +263,21 @@ export type MessageBubbleProps = {
   isCurrentUser: boolean;
   senderName?: string;
   senderAvatar?: string;
+  onLongPress?: () => void;
+  reactions?: Reaction[];
+  onReactionPress?: (emoji: string) => void;
+};
+
+export type Reaction = {
+  id: number | null;
+  emoji: string;
+  userId: number;
+  messageId: number;
+  createdAt: string | null;
+};
+
+export type NewReaction = {
+  emoji: string;
+  userId: number;
+  messageId: number;
 };
