@@ -1,5 +1,5 @@
 import { View, StyleSheet } from 'react-native';
-import { Card, Text, Chip } from 'react-native-paper';
+import { Card, Text, Chip, Avatar } from 'react-native-paper';
 import type { GroupCardProps } from '@/types';
 
 export function GroupCard({ group, onPress }: Readonly<GroupCardProps>) {
@@ -7,6 +7,19 @@ export function GroupCard({ group, onPress }: Readonly<GroupCardProps>) {
         <Card style={styles.card} onPress={onPress}>
             <Card.Content>
                 <View style={styles.container}>
+                    {group.coverPictureUrl ? (
+                        <Avatar.Image
+                            source={{ uri: group.coverPictureUrl }}
+                            size={40}
+                            style={styles.avatar}
+                        />
+                    ) : (
+                        <Avatar.Icon
+                            icon="account-group"
+                            size={40}
+                            style={styles.avatar}
+                        />
+                    )}
                     <View style={styles.textContainer}>
                         <Text variant="titleMedium" style={styles.name}>{group.name}</Text>
                         {group.createdAt && (
@@ -15,14 +28,13 @@ export function GroupCard({ group, onPress }: Readonly<GroupCardProps>) {
                             </Text>
                         )}
                     </View>
-                    <Chip icon={group.isPublic ? "earth" : "lock"}>
-                        {group.isPublic ? 'Public' : 'Private'}
-                    </Chip>
+                    <View style={styles.rightSection}>
+                        <Chip icon={group.isPublic ? "earth" : "lock"} style={styles.chip}>
+                            {group.isPublic ? 'Public' : 'Private'}
+                        </Chip>
+                    </View>
                 </View>
             </Card.Content>
-            {group.coverPictureUrl && (
-                <Card.Cover source={{ uri: group.coverPictureUrl }} />
-            )}
         </Card>
     );
 }
@@ -38,7 +50,7 @@ const styles = StyleSheet.create({
     },
     textContainer: {
         flex: 1,
-        marginRight: 12,
+        marginHorizontal: 12,
     },
     name: {
         fontWeight: 'bold',
@@ -46,5 +58,16 @@ const styles = StyleSheet.create({
     },
     description: {
         color: '#6b7280',
+    },
+    rightSection: {
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 4,
+    },
+    chip: {
+        height: 28,
+    },
+    avatar: {
+        backgroundColor: '#e5e7eb',
     },
 });
