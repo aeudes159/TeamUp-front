@@ -1,7 +1,6 @@
 import React from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Link, Tabs } from 'expo-router';
-import { Pressable } from 'react-native';
+import { Tabs } from 'expo-router';
 
 import Colors from '@/constants/Colors';
 import { useClientOnlyValue } from '@/components/useClientOnlyValue';
@@ -37,6 +36,13 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <TabBarIcon name="users" color={color} />,
         }}
       />
+        <Tabs.Screen
+            name="locations"
+            options={{
+                title: 'Événements',
+                tabBarIcon: ({ color }) => <TabBarIcon name="gamepad" color={color} />,
+            }}
+        />
       <Tabs.Screen
         name="profile"
         options={{

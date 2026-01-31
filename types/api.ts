@@ -227,6 +227,17 @@ export type LocationResponse = {
 
 export type LocationListResponse = PaginatedResponse<LocationResponse>;
 
+export type LocationSort = 'NAME' | 'POPULARITY';
+
+export type LocationQueryParams = {
+  page?: number;
+  size?: number;
+  name?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  sort?: LocationSort;
+};
+
 // ============================================
 // Pagination Params
 // ============================================
