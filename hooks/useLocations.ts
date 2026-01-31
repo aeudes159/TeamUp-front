@@ -19,6 +19,19 @@ import {apiGet, buildQueryString} from "@/lib/api";
  * Parse location response to ensure averagePrice is a number.
  * Backend uses BigDecimal which may serialize as string.
  */
+function parseLocationResponse(location: Location): Location {
+    if (!location) return location;
+    return {
+        ...location,
+        averagePrice: typeof location.averagePrice === 'string'
+            ? parseFloat(location.averagePrice)
+            : location.averagePrice,
+    };
+}
+
+/**
+ * Fetch all locations with pagination
+ */
 export function useLocations(params: LocationQueryParams = { page: 0, size: 20 }) {
   return useQuery({
     queryKey: ['locations', params],

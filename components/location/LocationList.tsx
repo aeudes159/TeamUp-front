@@ -16,8 +16,7 @@ type LocationListProps = {
     onEditLocation?: (location: Location) => void;
     onDeleteLocation?: (location: Location) => void;
     isLoading?: boolean;
-    error?: Error | null;
-    onRetry?: () => void;
+    onScroll?: (event: any) => void;
 };
 
 export function LocationList({
@@ -26,7 +25,9 @@ export function LocationList({
     onEditLocation,
     onDeleteLocation,
     isLoading = false,
+    onScroll,
 }: Readonly<LocationListProps>) {
+
     const { colors } = useTheme();
 
     if (isLoading) {
@@ -68,6 +69,8 @@ export function LocationList({
             )}
             contentContainerStyle={styles.listContent}
             showsVerticalScrollIndicator={false}
+            onScroll={onScroll}
+            scrollEventThrottle={16}
         />
     );
 }

@@ -1,9 +1,9 @@
-import {TouchableOpacity, View} from 'react-native';
+import {Image as ExpoImage} from 'expo-image';
+import {StyleSheet, TouchableOpacity, View} from 'react-native';
 import {Avatar, Surface, Text} from 'react-native-paper';
 import type {Location, Post, User} from '@/types';
-import {borderRadius, shadows, typography} from "@/constants/theme";
+import {borderRadius, colors, shadows, typography} from "@/constants/theme";
 import {Clock, MapPin, MessageCircle, Pencil, Trash2} from "lucide-react-native";
-import colors = module
 
 type PostCardProps = {
     post: Post;
@@ -85,7 +85,7 @@ export function PostCard({
                 
                 {/* Post Image */}
                 {post.imageUrl && (
-                    <Image source={{ uri: post.imageUrl }} style={styles.cover} contentFit="cover" />
+                    <ExpoImage source={{ uri: post.imageUrl }} style={styles.cover} contentFit="cover" />
                 )}
 
                 {/* Footer */}

@@ -51,9 +51,12 @@ function PostCardWithComments({
 }
 
 export default function FeedScreen() {
-    const { data: posts } = usePosts();
-    const { data: users = [] } = useUsers({ page: 0, size: 100 });
+    const { data: postsData, isLoading, error } = usePosts();
+    const { data: usersData } = useUsers({ page: 0, size: 100 });
     const { data: locations = [] } = useLocations({ page: 0, size: 100 });
+    
+    const posts = postsData?.data || [];
+    const users = usersData?.data || [];
 
     const createPost = useCreatePost();
     const updatePost = useUpdatePost();
@@ -198,14 +201,6 @@ export default function FeedScreen() {
                         </Surface>
                     </View>
                 )}
-<<<<<<< HEAD
-                <FeedList
-                    posts={posts}
-                    onPostPress={handlePostPress}
-                    isLoading={isLoading}
-                />
-=======
-
                 {(!posts || posts.length === 0) ? (
                     renderEmptyState()
                 ) : (
@@ -232,7 +227,6 @@ export default function FeedScreen() {
                         showsVerticalScrollIndicator={false}
                     />
                 )}
->>>>>>> c0119de (refacto: front)
             </View>
 
             {/* FAB for creating new post */}

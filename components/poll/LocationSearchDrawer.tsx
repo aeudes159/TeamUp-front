@@ -86,7 +86,7 @@ export function LocationSearchDrawer({
   } = useLocations({ page: 0, size: 50 });
 
   // Extract the data array from the response (hooks now return LocationListResponse)
-  const locations = debouncedQuery.trim() ? searchResults?.data : allLocations?.data;
+  const locations = debouncedQuery.trim() ? searchResults?.data : allLocations;
   const isLoading = debouncedQuery.trim() ? isSearching : isLoadingAll;
 
   const handleSelectLocation = (location: Location) => {
