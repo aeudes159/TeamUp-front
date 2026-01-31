@@ -4,12 +4,21 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { mockUser } from '@/mock/data';
 import { Text, Divider, useTheme } from 'react-native-paper';
+import { User } from 'lucide-react-native';
+import { colors, borderRadius, shadows, typography } from '@/constants/theme';
 
 export default function ProfileScreen() {
     const theme = useTheme();
     
     return (
         <Screen>
+            <View style={styles.header}>
+                <View style={styles.headerContent}>
+                    <User size={24} color={colors.lilac} />
+                    <Text style={styles.headerTitle}>Profil</Text>
+                    <User size={24} color={colors.coral} />
+                </View>
+            </View>
             <View style={styles.container}>
                 <Card style={styles.profileCard}>
                     <Image
@@ -53,6 +62,24 @@ export default function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
+    header: {
+        backgroundColor: colors.background,
+        paddingTop: 16,
+        paddingBottom: 8,
+        paddingHorizontal: 20,
+        ...shadows.soft,
+    },
+    headerContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 12,
+    },
+    headerTitle: {
+        ...typography.titleLarge,
+        color: colors.card,
+        fontWeight: '700',
+    },
     container: {
         padding: 16,
         flex: 1,

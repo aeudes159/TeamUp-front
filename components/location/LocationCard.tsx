@@ -1,5 +1,6 @@
 import { View, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text, IconButton } from 'react-native-paper';
+import { colors, borderRadius, shadows, typography } from '@/constants/theme';
 import type { Location } from '@/types';
 
 type LocationCardProps = {
@@ -62,7 +63,7 @@ export function LocationCard({ location, onPress, onEdit, onDelete, showActions 
                                     <IconButton
                                         icon="pencil"
                                         size={18}
-                                        iconColor="#B8A1D9"
+                                        iconColor={colors.lilac}
                                         style={styles.noImageActionButton}
                                         onPress={(e) => {
                                             e.stopPropagation?.();
@@ -74,7 +75,7 @@ export function LocationCard({ location, onPress, onEdit, onDelete, showActions 
                                     <IconButton
                                         icon="delete"
                                         size={18}
-                                        iconColor="#F08A5D"
+                                        iconColor={colors.coral}
                                         style={styles.noImageActionButton}
                                         onPress={(e) => {
                                             e.stopPropagation?.();
@@ -105,17 +106,11 @@ export function LocationCard({ location, onPress, onEdit, onDelete, showActions 
 
 const styles = StyleSheet.create({
     card: {
-        backgroundColor: '#F3D1C8',
-        borderRadius: 24,
+        backgroundColor: colors.card,
+        borderRadius: borderRadius.xl,
         overflow: 'hidden',
         marginBottom: 20,
-        elevation: 4,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.12,
-        shadowRadius: 8,
-        borderWidth: 1,
-        borderColor: 'rgba(255, 255, 255, 0.3)',
+        ...shadows.soft,
     },
     imageContainer: {
         position: 'relative',
@@ -132,14 +127,14 @@ const styles = StyleSheet.create({
         gap: 8,
     },
     actionButton: {
-        backgroundColor: 'rgba(184, 161, 217, 0.9)',
+        backgroundColor: `${colors.lilac}E6`,
         margin: 0,
-        borderRadius: 16,
+        borderRadius: borderRadius.md,
     },
     deleteButton: {
-        backgroundColor: 'rgba(240, 138, 93, 0.9)',
+        backgroundColor: `${colors.coral}E6`,
         margin: 0,
-        borderRadius: 16,
+        borderRadius: borderRadius.md,
     },
     content: {
         padding: 20,
@@ -150,11 +145,8 @@ const styles = StyleSheet.create({
         alignItems: 'flex-start',
     },
     name: {
-        fontWeight: '700',
-        color: '#2E1A47',
+        ...typography.titleSmall,
         flex: 1,
-        fontSize: 18,
-        fontFamily: 'System',
     },
     noImageActions: {
         flexDirection: 'row',
@@ -163,23 +155,22 @@ const styles = StyleSheet.create({
     noImageActionButton: {
         margin: 0,
         marginLeft: -4,
-        borderRadius: 16,
+        borderRadius: borderRadius.md,
     },
     address: {
         marginTop: 8,
-        color: '#3A235A',
-        fontSize: 15,
-        opacity: 0.8,
+        ...typography.bodyMedium,
+        color: colors.textSecondary,
     },
     price: {
         marginTop: 12,
-        color: '#3A235A',
+        ...typography.bodySmall,
+        color: colors.text,
         fontWeight: '600',
-        fontSize: 16,
-        backgroundColor: '#F6D186',
+        backgroundColor: colors.yellow,
         alignSelf: 'flex-start',
         paddingHorizontal: 12,
         paddingVertical: 6,
-        borderRadius: 12,
+        borderRadius: borderRadius.md,
     },
 });

@@ -1,6 +1,8 @@
 import { FlatList, View, StyleSheet } from 'react-native';
 import { Text, ActivityIndicator } from 'react-native-paper';
 import { LocationCard } from './LocationCard';
+import { colors, borderRadius, shadows, typography } from '@/constants/theme';
+import { MapPin } from 'lucide-react-native';
 import type { Location } from '@/types';
 
 type LocationListProps = {
@@ -22,8 +24,10 @@ export function LocationList({
     if (isLoading) {
         return (
             <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" />
-                <Text variant="bodyMedium" style={styles.loadingText}>
+                <View style={styles.loadingIconContainer}>
+                    <ActivityIndicator size="large" color={colors.lilac} />
+                </View>
+                <Text style={styles.loadingText}>
                     Chargement des lieux...
                 </Text>
             </View>
@@ -33,17 +37,26 @@ export function LocationList({
     if (locations.length === 0) {
         return (
             <View style={styles.emptyContainer}>
-                <Text variant="bodyLarge" style={styles.emptyText}>
+                <View style={styles.emptyIconContainer}>
+                    <MapPin size={48} color={colors.coral} />
+                </View>
+                <Text style={styles.emptyText}>
                     Aucun lieu disponible
                 </Text>
-                <Text variant="bodyMedium" style={styles.emptySubtext}>
+                <Text style={styles.emptySubtext}>
                     Ajoutez un nouveau lieu pour commencer
                 </Text>
+                <View style={styles.decorativeDots}>
+                    <View style={[styles.dot, { backgroundColor: colors.lilac }]} />
+                    <View style={[styles.dot, { backgroundColor: colors.yellow }]} />
+                    <View style={[styles.dot, { backgroundColor: colors.coral }]} />
+                </View>
             </View>
         );
     }
 
     return (
+        <div style={{ marginTop: "1rem" }}>
         <FlatList
             data={locations}
             keyExtractor={(item) => String(item.id)}
@@ -57,6 +70,7 @@ export function LocationList({
             )}
             contentContainerStyle={styles.listContent}
         />
+        </div>
     );
 }
 
@@ -65,37 +79,56 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        padding: 40,
-        backgroundColor: '#F6E6D8',
+        padding: 32,
+    },
+    loadingIconContainer: {
+        padding: 20,
+        borderRadius: borderRadius.xl,
+        backgroundColor: colors.card,
+        marginBottom: 20,
+        ...shadows.warm,
     },
     loadingText: {
-        marginTop: 20,
-        color: '#3A235A',
-        fontSize: 16,
-        fontWeight: '500',
-        fontFamily: 'System',
+        ...typography.bodyMedium,
+        color: colors.card,
+        textAlign: 'center',
+        marginTop: 16,
     },
     emptyContainer: {
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        padding: 40,
-        backgroundColor: '#F6E6D8',
+        padding: 32,
+    },
+    emptyIconContainer: {
+        padding: 20,
+        borderRadius: borderRadius.xl,
+        backgroundColor: colors.card,
+        marginBottom: 24,
+        ...shadows.artistic,
     },
     emptyText: {
+        ...typography.titleMedium,
+        color: colors.card,
         textAlign: 'center',
-        color: '#2E1A47',
-        fontWeight: '700',
-        fontSize: 20,
-        fontFamily: 'System',
+        marginBottom: 8,
     },
     emptySubtext: {
+        ...typography.bodyMedium,
+        color: colors.cardLight,
         textAlign: 'center',
-        color: '#3A235A',
-        marginTop: 12,
-        fontSize: 16,
-        opacity: 0.8,
-        fontFamily: 'System',
+        marginBottom: 32,
+        lineHeight: 24,
+    },
+    decorativeDots: {
+        flexDirection: 'row',
+        gap: 12,
+        marginTop: 20,
+    },
+    dot: {
+        width: 12,
+        height: 12,
+        borderRadius: borderRadius.pill,
     },
     listContent: {
         paddingHorizontal: 20,

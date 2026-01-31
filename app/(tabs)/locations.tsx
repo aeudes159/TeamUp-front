@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { View, StyleSheet, Alert } from 'react-native';
 import { Screen } from '@/components/layout/Screen';
 import { Appbar, Menu, Button, Searchbar, Text, FAB } from 'react-native-paper';
+import { MapPin } from 'lucide-react-native';
+import { colors, borderRadius, shadows, typography } from '@/constants/theme';
 import { LocationList } from '@/components/location/LocationList';
 import { CreateLocationModal } from '@/components/location/CreateLocationModal';
 import { EditLocationModal } from '@/components/location/EditLocationModal';
@@ -105,18 +107,14 @@ export default function LocationsScreen() {
     };
 
     return (
-        <Screen scrollable={false}>
-            <Appbar.Header style={{ backgroundColor: '#2E1A47' }}>
-                <Appbar.Content 
-                    title="Lieux" 
-                    titleStyle={{ 
-                        color: '#FFFFFF', 
-                        fontWeight: '700', 
-                        fontSize: 22,
-                        fontFamily: 'System'
-                    }} 
-                />
-            </Appbar.Header>
+        <Screen scrollable={true}>
+            <View style={styles.header}>
+                <View style={styles.headerContent}>
+                    <MapPin size={24} color={colors.lilac} />
+                    <Text style={styles.headerTitle}>Lieux</Text>
+                    <MapPin size={24} color={colors.coral} />
+                </View>
+            </View>
 
             <View style={styles.filtersContainer}>
                 <View style={styles.topRow}>
@@ -222,7 +220,7 @@ export default function LocationsScreen() {
                 </View>
             </View>
 
-            <View style={styles.container}>
+            <View style={styles.contentContainer}>
                 {error && (
                     <View style={styles.errorContainer}>
                         <Text variant="bodyMedium" style={styles.errorText}>
@@ -272,11 +270,29 @@ export default function LocationsScreen() {
 }
 
 const styles = StyleSheet.create({
+    header: {
+        backgroundColor: colors.background,
+        paddingTop: 16,
+        paddingBottom: 8,
+        paddingHorizontal: 20,
+        ...shadows.soft,
+    },
+    headerContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 12,
+    },
+    headerTitle: {
+        ...typography.titleLarge,
+        color: colors.card,
+        fontWeight: '700',
+    },
     filtersContainer: {
         paddingHorizontal: 20,
         paddingVertical: 16,
         gap: 20,
-        backgroundColor: '#F6E6D8',
+        backgroundColor: colors.card,
     },
     topRow: {
         flexDirection: 'row',
@@ -290,12 +306,8 @@ const styles = StyleSheet.create({
         maxWidth: 320,
         borderRadius: 24,
         height: 48,
-        backgroundColor: '#FFFFFF',
-        elevation: 2,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
+        backgroundColor: colors.white,
+        ...shadows.soft,
     },
     searchbarInput: {
         paddingVertical: 8,
@@ -307,12 +319,8 @@ const styles = StyleSheet.create({
         height: 48,
         justifyContent: 'center',
         minWidth: 140,
-        backgroundColor: '#FFFFFF',
-        elevation: 2,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
+        backgroundColor: colors.white,
+        ...shadows.soft,
     },
     sortButtonContent: {
         paddingHorizontal: 16,
@@ -320,7 +328,7 @@ const styles = StyleSheet.create({
     sortButtonLabel: {
         fontSize: 14,
         fontWeight: '600',
-        color: '#3A235A',
+        color: colors.primary,
     },
     priceFiltersRow: {
         flexDirection: 'row',
@@ -329,27 +337,22 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     priceFilterLabel: {
-        fontSize: 18,
+        ...typography.titleSmall,
         marginRight: 12,
         alignSelf: 'center',
-        fontWeight: '700',
-        color: '#3A235A',
-        fontFamily: 'System',
+        color: colors.primary,
     },
     priceButton: {
-        borderRadius: 20,
+        borderRadius: borderRadius.lg,
         minWidth: 90,
         height: 40,
         justifyContent: 'center',
-        elevation: 2,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.08,
-        shadowRadius: 3,
+        ...shadows.soft,
     },
-    container: {
+    contentContainer: {
         flex: 1,
-        backgroundColor: '#F6E6D8',
+        backgroundColor: colors.background,
+        minHeight: 200,
     },
     errorContainer: {
         padding: 20,
@@ -372,12 +375,8 @@ const styles = StyleSheet.create({
         position: 'absolute',
         right: 20,
         bottom: 20,
-        backgroundColor: '#F08A5D',
-        borderRadius: 30,
-        elevation: 6,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.15,
-        shadowRadius: 8,
+        backgroundColor: colors.coral,
+        borderRadius: borderRadius.pill,
+        ...shadows.warm,
     },
 });
