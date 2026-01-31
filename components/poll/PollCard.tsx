@@ -1,6 +1,7 @@
 import { View, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { Card, Text, ProgressBar, Button, Chip } from 'react-native-paper';
+import { Surface, Text, ProgressBar, Button, Chip } from 'react-native-paper';
 import { MapPin, Plus, Check, Lock } from 'lucide-react-native';
+import { colors, shadows, borderRadius, spacing, typography } from '@/constants/theme';
 import type { Poll, PollOption } from '@/types';
 
 type PollCardProps = {
@@ -57,14 +58,14 @@ function PollOptionItem({
         <View style={styles.optionInfo}>
           <View style={styles.optionHeader}>
             <View style={styles.locationNameRow}>
-              <MapPin size={14} color={isClosed ? '#9ca3af' : '#6366f1'} />
-              <Text variant="bodyMedium" style={[styles.locationName, isClosed && styles.textMuted]}>
+              <MapPin size={14} color={isClosed ? colors.textLight : colors.primary} />
+              <Text style={[typography.bodyMedium, styles.locationName, isClosed && styles.textMuted]}>
                 {option.locationName || 'Unknown location'}
               </Text>
             </View>
             {hasVoted && (
               <Chip
-                icon={() => <Check size={12} color="#fff" />}
+                icon={() => <Check size={12} color={colors.white} />}
                 style={[styles.votedChip, isClosed && styles.votedChipClosed]}
                 textStyle={styles.votedChipText}
               >
@@ -73,17 +74,17 @@ function PollOptionItem({
             )}
           </View>
           {option.locationAddress && (
-            <Text variant="bodySmall" style={styles.locationAddress}>
+            <Text style={[typography.bodySmall, styles.locationAddress]}>
               {option.locationAddress}
             </Text>
           )}
           <View style={styles.progressContainer}>
             <ProgressBar
               progress={votePercentage}
-              color={hasVoted ? (isClosed ? '#9ca3af' : '#6366f1') : '#94a3b8'}
+              color={hasVoted ? (isClosed ? colors.textLight : colors.primary) : colors.lilac}
               style={styles.progressBar}
             />
-            <Text variant="bodySmall" style={styles.voteCount}>
+            <Text style={[typography.bodySmall, styles.voteCount]}>
               {option.voteCount} vote{option.voteCount !== 1 ? 's' : ''} (
               {Math.round(votePercentage * 100)}%)
             </Text>
@@ -116,16 +117,16 @@ export function PollCard({
   };
 
   return (
-    <Card style={styles.card}>
-      <Card.Content>
+    <Surface style={[styles.card, shadows.soft]} elevation={0}>
+      <View style={styles.cardContent}>
         <View style={styles.header}>
           <View style={styles.titleContainer}>
-            <Text variant="titleMedium" style={styles.title}>
+            <Text style={[typography.titleMedium, styles.title]}>
               {poll.title}
             </Text>
             {isClosed && (
               <Chip
-                icon={() => <Lock size={12} color="#fff" />}
+                icon={() => <Lock size={12} color={colors.white} />}
                 style={styles.closedChip}
                 textStyle={styles.closedChipText}
               >
@@ -133,7 +134,7 @@ export function PollCard({
               </Chip>
             )}
           </View>
-          <Text variant="bodySmall" style={styles.date}>
+          <Text style={[typography.bodySmall, styles.date]}>
             {isClosed
               ? `Closed ${formatDate(poll.closedAt)}`
               : formatDate(poll.createdAt)
@@ -142,7 +143,7 @@ export function PollCard({
         </View>
 
         {poll.description && (
-          <Text variant="bodyMedium" style={styles.description}>
+          <Text style={[typography.bodyMedium, styles.description]}>
             {poll.description}
           </Text>
         )}
@@ -166,12 +167,12 @@ export function PollCard({
             style={styles.addOptionButton}
             onPress={() => poll.id && onAddOption(poll.id)}
           >
-            <Plus size={18} color="#6366f1" />
+            <Plus size={18} color={colors.primary} />
             <Text style={styles.addOptionText}>Add a location</Text>
           </TouchableOpacity>
         )}
 
-        <Text variant="bodySmall" style={styles.totalVotes}>
+        <Text style={[typography.bodySmall, styles.totalVotes]}>
           {poll.totalVotes} total vote{poll.totalVotes !== 1 ? 's' : ''}
         </Text>
 
@@ -180,24 +181,29 @@ export function PollCard({
             mode="outlined"
             onPress={() => poll.id && onClosePoll(poll.id)}
             style={styles.closeButton}
-            textColor="#ef4444"
-            icon={() => <Lock size={16} color="#ef4444" />}
+            textColor={colors.coral}
+            icon={() => <Lock size={16} color={colors.coral} />}
           >
             Close Poll
           </Button>
         )}
-      </Card.Content>
-    </Card>
+      </View>
+    </Surface>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#ffffff',
-    flex: 1,
+    backgroundColor: colors.card,
+    borderRadius: borderRadius.lg,
+    overflow: 'hidden',
+    marginBottom: spacing.md,
+  },
+  cardContent: {
+    padding: spacing.md,
   },
   header: {
-    marginBottom: 8,
+    marginBottom: spacing.sm,
   },
   titleContainer: {
     flexDirection: 'row',
@@ -205,32 +211,33 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   title: {
-    fontWeight: 'bold',
+    color: colors.text,
     flex: 1,
   },
   closedChip: {
-    backgroundColor: '#ef4444',
-    marginLeft: 8,
+    backgroundColor: colors.coral,
+    marginLeft: spacing.sm,
+    height: 24,
   },
   closedChipText: {
-    color: '#ffffff',
+    color: colors.white,
     fontSize: 10,
   },
   date: {
-    color: '#6b7280',
+    color: colors.textSecondary,
     marginTop: 4,
   },
   description: {
-    color: '#4b5563',
-    marginBottom: 12,
+    color: colors.text,
+    marginBottom: spacing.md,
   },
   optionsList: {
-    marginTop: 8,
+    marginTop: spacing.sm,
   },
   optionContainer: {
-    backgroundColor: '#f8fafc',
-    borderRadius: 8,
-    marginBottom: 8,
+    backgroundColor: colors.white,
+    borderRadius: borderRadius.md,
+    marginBottom: spacing.sm,
     overflow: 'hidden',
   },
   optionContainerClosed: {
@@ -238,13 +245,13 @@ const styles = StyleSheet.create({
   },
   optionContent: {
     flexDirection: 'row',
-    padding: 12,
+    padding: spacing.sm,
   },
   locationImage: {
     width: 60,
     height: 60,
-    borderRadius: 8,
-    marginRight: 12,
+    borderRadius: borderRadius.sm,
+    marginRight: spacing.md,
   },
   optionInfo: {
     flex: 1,
@@ -261,27 +268,27 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   locationName: {
-    fontWeight: '600',
+    color: colors.text,
     marginLeft: 4,
     flex: 1,
   },
   textMuted: {
-    color: '#6b7280',
+    color: colors.textLight,
   },
   votedChip: {
-    backgroundColor: '#6366f1',
+    backgroundColor: colors.primary,
     height: 24,
   },
   votedChipClosed: {
-    backgroundColor: '#9ca3af',
+    backgroundColor: colors.textLight,
   },
   votedChipText: {
-    color: '#ffffff',
+    color: colors.white,
     fontSize: 10,
   },
   locationAddress: {
-    color: '#6b7280',
-    marginBottom: 8,
+    color: colors.textSecondary,
+    marginBottom: spacing.sm,
   },
   progressContainer: {
     marginTop: 4,
@@ -289,10 +296,10 @@ const styles = StyleSheet.create({
   progressBar: {
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#e2e8f0',
+    backgroundColor: colors.cardLight,
   },
   voteCount: {
-    color: '#6b7280',
+    color: colors.textSecondary,
     marginTop: 4,
     textAlign: 'right',
   },
@@ -300,25 +307,25 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 12,
+    padding: spacing.md,
     borderWidth: 1,
-    borderColor: '#6366f1',
+    borderColor: colors.primary,
     borderStyle: 'dashed',
-    borderRadius: 8,
-    marginTop: 8,
+    borderRadius: borderRadius.md,
+    marginTop: spacing.sm,
   },
   addOptionText: {
-    color: '#6366f1',
+    color: colors.primary,
     marginLeft: 8,
     fontWeight: '500',
   },
   totalVotes: {
-    color: '#6b7280',
+    color: colors.textSecondary,
     textAlign: 'center',
-    marginTop: 12,
+    marginTop: spacing.md,
   },
   closeButton: {
-    marginTop: 12,
-    borderColor: '#ef4444',
+    marginTop: spacing.md,
+    borderColor: colors.coral,
   },
 });

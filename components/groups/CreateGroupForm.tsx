@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, Animated, TouchableOpacity, Dimensions } from 'react-native';
-import { Screen } from '@/components/layout/Screen';
-import { Input } from '@/components/ui/Input';
-import { Text, Surface } from 'react-native-paper';
-import { router } from 'expo-router';
-import { GroupAvatarPicker } from './GroupAvatarPicker';
-import { GroupTypeSelector } from './GroupTypeSelector';
-import { ParticipantSelector } from './ParticipantSelector';
+import React, {useState} from 'react';
+import {Animated, Dimensions, StyleSheet, TouchableOpacity, View} from 'react-native';
+import {Screen} from '@/components/layout/Screen';
+import {Input} from '@/components/ui/Input';
+import {Surface, Text} from 'react-native-paper';
+import {router} from 'expo-router';
+import {GroupAvatarPicker} from './GroupAvatarPicker';
+import {GroupTypeSelector} from './GroupTypeSelector';
+import {ParticipantSelector} from './ParticipantSelector';
 import {useCreateGroup} from "@/hooks/useGroups";
+import {borderRadius, colors, shadows, spacing, typography} from '@/constants/theme';
 
 type Participant = {
     id: string;
@@ -42,9 +43,9 @@ export default function CreateGroupScreen() {
     };
 
     return (
-        <Screen scrollable={false} style={{ backgroundColor: '#3A235A' }}>
+        <Screen scrollable={false} style={{ backgroundColor: colors.background }}>
             <Animated.View style={[styles.headerContainer, { opacity: headerOpacity }]}>
-                <Surface style={styles.headerSurface} elevation={0}>
+                <Surface style={[styles.headerSurface, shadows.soft]} elevation={0}>
                     <View style={styles.headerContent}>
                         <TouchableOpacity 
                             onPress={() => router.back()}
@@ -73,7 +74,7 @@ export default function CreateGroupScreen() {
                     showsVerticalScrollIndicator={false}
                 >
                     {/* Background Surface pour tout le contenu */}
-                    <Surface style={styles.contentSurface}>
+                    <Surface style={[styles.contentSurface, shadows.soft]} elevation={0}>
                         {/* Avatar Section - Centrée en haut */}
                         <View style={styles.avatarSection}>
                             <GroupAvatarPicker
@@ -96,6 +97,7 @@ export default function CreateGroupScreen() {
                                 placeholder="Donnez un nom à votre groupe"
                                 value={groupName}
                                 onChangeText={setGroupName}
+                                style={{ backgroundColor: colors.white }}
                             />
 
                             <GroupTypeSelector
@@ -151,21 +153,13 @@ export default function CreateGroupScreen() {
 const styles = StyleSheet.create({
     headerContainer: {
         paddingTop: 60,
-        paddingHorizontal: 24,
-        paddingBottom: 24,
+        paddingHorizontal: spacing.lg,
+        paddingBottom: spacing.lg,
     },
     headerSurface: {
-        borderRadius: 28,
-        backgroundColor: '#F6E6D8',
-        padding: 24,
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 8,
-        },
-        shadowOpacity: 0.15,
-        shadowRadius: 24,
-        elevation: 12,
+        borderRadius: borderRadius.xl,
+        backgroundColor: colors.card,
+        padding: spacing.lg,
     },
     headerContent: {
         flexDirection: 'row',
@@ -176,10 +170,10 @@ const styles = StyleSheet.create({
         width: 40,
         height: 40,
         borderRadius: 20,
-        backgroundColor: '#F3D1C8',
+        backgroundColor: colors.cardLight,
         alignItems: 'center',
         justifyContent: 'center',
-        shadowColor: '#F08A5D',
+        shadowColor: colors.coral,
         shadowOffset: {
             width: 0,
             height: 4,
@@ -191,34 +185,30 @@ const styles = StyleSheet.create({
     backIcon: {
         fontSize: 20,
         fontWeight: '600',
-        color: '#F08A5D',
+        color: colors.coral,
     },
     headerText: {
         flex: 1,
     },
     subtitle: {
-        fontSize: 14,
-        fontFamily: 'System',
-        fontWeight: '500',
-        color: '#F08A5D',
+        ...typography.bodySmall,
+        color: colors.coral,
         marginBottom: 4,
         letterSpacing: 0.5,
+        fontWeight: '500',
     },
     title: {
-        fontSize: 24,
-        fontFamily: 'System',
-        fontWeight: '700',
-        color: '#2E1A47',
+        ...typography.titleLarge,
+        color: colors.text,
         letterSpacing: -0.8,
-        lineHeight: 28,
     },
     contentContainer: {
         flex: 1,
-        backgroundColor: '#3A235A',
-        paddingHorizontal: 24,
-        paddingTop: 24,
-        borderTopLeftRadius: 32,
-        borderTopRightRadius: 32,
+        backgroundColor: colors.primary,
+        paddingHorizontal: spacing.lg,
+        paddingTop: spacing.lg,
+        borderTopLeftRadius: borderRadius.xl,
+        borderTopRightRadius: borderRadius.xl,
         marginTop: -16,
     },
     scrollView: {
@@ -228,42 +218,34 @@ const styles = StyleSheet.create({
         paddingBottom: 40,
     },
     contentSurface: {
-        borderRadius: 24,
-        backgroundColor: '#F6E6D8',
-        padding: 32,
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 6,
-        },
-        shadowOpacity: 0.12,
-        shadowRadius: 20,
-        elevation: 10,
+        borderRadius: borderRadius.lg,
+        backgroundColor: colors.card,
+        padding: spacing.xl,
     },
     avatarSection: {
         alignItems: 'center',
-        marginBottom: 32,
+        marginBottom: spacing.xl,
     },
     formSection: {
-        marginBottom: 32,
+        marginBottom: spacing.xl,
     },
     participantsSection: {
-        marginBottom: 32,
+        marginBottom: spacing.xl,
     },
     sectionHeader: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 20,
+        marginBottom: spacing.lg,
     },
     sectionIconContainer: {
         width: 40,
         height: 40,
         borderRadius: 20,
-        backgroundColor: '#F6D186',
+        backgroundColor: colors.yellow,
         alignItems: 'center',
         justifyContent: 'center',
         marginRight: 12,
-        shadowColor: '#F6D186',
+        shadowColor: colors.yellow,
         shadowOffset: {
             width: 0,
             height: 4,
@@ -276,24 +258,21 @@ const styles = StyleSheet.create({
         fontSize: 18,
     },
     sectionTitle: {
-        fontSize: 18,
-        fontFamily: 'System',
-        fontWeight: '600',
-        color: '#2E1A47',
+        ...typography.titleMedium,
         letterSpacing: -0.4,
     },
     buttonContainer: {
         marginTop: 20,
     },
     createButton: {
-        borderRadius: 24,
-        backgroundColor: '#B8A1D9',
+        borderRadius: borderRadius.xl,
+        backgroundColor: colors.lilac,
         paddingVertical: 18,
         paddingHorizontal: 24,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        shadowColor: '#B8A1D9',
+        shadowColor: colors.lilac,
         shadowOffset: {
             width: 0,
             height: 8,
@@ -303,14 +282,13 @@ const styles = StyleSheet.create({
         elevation: 12,
     },
     createButtonDisabled: {
-        backgroundColor: '#9CA3AF',
+        backgroundColor: colors.textLight,
         shadowOpacity: 0.1,
     },
     createButtonText: {
-        fontSize: 18,
-        fontFamily: 'System',
+        ...typography.bodyLarge,
         fontWeight: '600',
-        color: '#FFFFFF',
+        color: colors.white,
         letterSpacing: 0.3,
         flex: 1,
         textAlign: 'center',

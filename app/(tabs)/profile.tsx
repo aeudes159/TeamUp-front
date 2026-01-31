@@ -1,16 +1,41 @@
-import { View, Image, StyleSheet } from 'react-native';
+import { View, Image, StyleSheet, Animated } from 'react-native';
 import { Screen } from '@/components/layout/Screen';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { mockUser } from '@/mock/data';
-import { Text, Divider, useTheme } from 'react-native-paper';
+import { Text, Divider, useTheme, Surface } from 'react-native-paper';
+import { colors, shadows, borderRadius, spacing } from '@/constants/theme';
+import { useState } from 'react';
+import { LogOut, Edit2 } from 'lucide-react-native';
 
 export default function ProfileScreen() {
     const theme = useTheme();
+    const [scrollY] = useState(new Animated.Value(0));
+
+    const headerOpacity = scrollY.interpolate({
+        inputRange: [0, 100],
+        outputRange: [1, 0.8],
+        extrapolate: 'clamp',
+    });
     
     return (
-        <Screen>
-            <View style={styles.container}>
+        <Screen scrollable={false} style={{ backgroundColor: colors.background }}>
+            <Animated.View style={[styles.headerContainer, { opacity: headerOpacity }]}>
+                <Surface style={[styles.headerSurface, shadows.soft]} elevation={0}>
+                    <Text style={[styles.title, { color: colors.text }]}>Profil</Text>
+                </Surface>
+            </Animated.View>
+
+            <Animated.ScrollView
+                style={styles.container}
+                contentContainerStyle={styles.contentContainer}
+                onScroll={Animated.event(
+                    [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+                    { useNativeDriver: false }
+                )}
+                scrollEventThrottle={16}
+                showsVerticalScrollIndicator={false}
+            >
                 <Card style={styles.profileCard}>
                     <Image
                         source={{ uri: mockUser.avatar_url }}
@@ -40,22 +65,54 @@ export default function ProfileScreen() {
                     </View>
                 </Card>
 
-                <Button onPress={() => console.log('Modifier profil')} style={styles.button}>
-                    ✏️ Modifier le profil
-                </Button>
+                <View style={styles.actionButtons}>
+                    <Button 
+                        onPress={() => console.log('Modifier profil')} 
+                        style={styles.button}
+                        icon="pencil"
+                        variant="secondary"
+                    >
+                        Modifier le profil
+                    </Button>
 
-                <Button variant="outline" onPress={() => console.log('Déconnexion')} style={styles.button}>
-                    🚪 Se déconnecter
-                </Button>
-            </View>
+                    <Button 
+                        variant="destructive" 
+                        onPress={() => console.log('Déconnexion')} 
+                        style={styles.button}
+                        icon="logout"
+                    >
+                        Se déconnecter
+                    </Button>
+                </View>
+            </Animated.ScrollView>
         </Screen>
     );
 }
 
 const styles = StyleSheet.create({
+    headerContainer: {
+        paddingTop: 16,
+        paddingHorizontal: 24,
+        paddingBottom: 8,
+    },
+    headerSurface: {
+        borderRadius: 20,
+        paddingVertical: 12,
+        paddingHorizontal: 24,
+        alignItems: 'center',
+        backgroundColor: colors.card,
+    },
+    title: {
+        fontSize: 20,
+        fontWeight: '700',
+        letterSpacing: -0.5,
+        color: colors.text,
+    },
     container: {
-        padding: 16,
         flex: 1,
+    },
+    contentContainer: {
+        padding: 16,
     },
     profileCard: {
         alignItems: 'center',
@@ -81,7 +138,7 @@ const styles = StyleSheet.create({
         color: '#374151',
     },
     statsCard: {
-        marginBottom: 16,
+        marginBottom: 24,
         padding: 16,
     },
     statsTitle: {
@@ -102,7 +159,12 @@ const styles = StyleSheet.create({
         color: '#6b7280',
         marginTop: 4,
     },
+    actionButtons: {
+        marginTop: 8,
+        gap: 12,
+        paddingBottom: 40,
+    },
     button: {
-        marginBottom: 12,
+        width: '100%',
     },
 });

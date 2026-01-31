@@ -5,15 +5,11 @@
  * The factory handles all the boilerplate for CRUD operations.
  */
 
-import { createCrudHooks, createSearchHook } from '@/lib/createCrudHooks';
-import { mockLocations } from '@/mock/data';
-import type {
-    Location,
-    NewLocation,
-    LocationListResponse,
-    LocationResponse,
-    LocationQueryParams,
-} from '@/types';
+import {createCrudHooks, createSearchHook} from '@/lib/createCrudHooks';
+import {mockLocations} from '@/mock/data';
+import type {Location, LocationListResponse, LocationQueryParams, NewLocation,} from '@/types';
+import {useQuery} from "@tanstack/react-query";
+import {apiGet, buildQueryString} from "@/lib/api";
 
 // ============================================
 // Response Transformer (handles BigDecimal → number)
@@ -23,13 +19,15 @@ import type {
  * Parse location response to ensure averagePrice is a number.
  * Backend uses BigDecimal which may serialize as string.
  */
-function parseLocationResponse(location: LocationResponse): LocationResponse {
-    return {
-        ...location,
-        averagePrice: location.averagePrice !== null
-            ? Number(location.averagePrice)
-            : null,
-    };
+export function useLocations(params: LocationQueryParams = { page: 0, size: 20 }) {
+  return useQuery({
+    queryKey: ['locations', params],
+    queryFn: async () => {
+      const queryString = buildQueryString(params);
+      const response = await apiGet<LocationListResponse>(`/api/locations${queryString}`);
+      return response.data as Location[];
+    },
+  });
 }
 
 // ============================================
@@ -45,19 +43,6 @@ const locationHooks = createCrudHooks<Location, NewLocation, LocationListRespons
 // ============================================
 // Export Individual Hooks
 // ============================================
-
-/**
- * Fetch all locations with pagination and optional filters
- * 
- * @param params - Query parameters including pagination and filters
- * @returns Query result with LocationListResponse
- * 
- * @example
- * const { data, isLoading } = useLocations({ page: 0, size: 20, sort: 'NAME' });
- */
-export function useLocations(params: LocationQueryParams = { page: 0, size: 20 }) {
-    return locationHooks.useList(params);
-}
 
 /**
  * Fetch a single location by ID

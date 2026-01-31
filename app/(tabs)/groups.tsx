@@ -5,13 +5,14 @@
  * Uses the refactored useGroups hook with proper data access.
  */
 
-import React, { useState } from 'react';
-import { View, StyleSheet, Dimensions, Animated, TouchableOpacity } from 'react-native';
-import { Screen } from '@/components/layout/Screen';
-import { GroupCard } from '@/components/groups/GroupCard';
-import { useGroups } from '@/hooks/useGroups';
-import { router } from 'expo-router';
-import { ActivityIndicator, Text, Surface } from 'react-native-paper';
+import React, {useState} from 'react';
+import {Animated, Dimensions, StyleSheet, TouchableOpacity, View} from 'react-native';
+import {Screen} from '@/components/layout/Screen';
+import {GroupCard} from '@/components/groups/GroupCard';
+import {useGroups} from '@/hooks/useGroups';
+import {router} from 'expo-router';
+import {ActivityIndicator, Surface, Text} from 'react-native-paper';
+import {borderRadius, colors, shadows, spacing, typography} from '@/constants/theme';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -29,9 +30,9 @@ export default function GroupsScreen() {
     });
 
     return (
-        <Screen scrollable={false} style={{ backgroundColor: '#3A235A' }}>
+        <Screen scrollable={false} style={{ backgroundColor: colors.background }}>
             <Animated.View style={[styles.headerContainer, { opacity: headerOpacity }]}>
-                <Surface style={styles.headerSurface} elevation={0}>
+                <Surface style={[styles.headerSurface, shadows.soft]} elevation={0}>
                     <View style={styles.headerContent}>
                         <View>
                             <Text style={styles.title}>Mes Groupes</Text>
@@ -52,7 +53,7 @@ export default function GroupsScreen() {
             <View style={styles.contentContainer}>
                 {isLoading && (
                     <View style={styles.centerContent}>
-                        <ActivityIndicator size="large" color="#B8A1D9" />
+                        <ActivityIndicator size="large" color={colors.lilac} />
                         <Text style={styles.loadingText}>Chargement de vos groupes...</Text>
                     </View>
                 )}
@@ -77,7 +78,7 @@ export default function GroupsScreen() {
 
                 {!isLoading && !error && groups.length === 0 && (
                     <View style={styles.centerContent}>
-                        <Surface style={styles.emptyCard}>
+                        <Surface style={[styles.emptyCard, shadows.soft]}>
                             <View style={styles.emptyIconContainer}>
                                 <Text style={styles.emptyIcon}>🎨</Text>
                             </View>
@@ -135,47 +136,30 @@ export default function GroupsScreen() {
 
 const styles = StyleSheet.create({
     headerContainer: {
-        paddingTop: 60,
+        paddingTop: 16,
         paddingHorizontal: 24,
-        paddingBottom: 24,
+        paddingBottom: 8,
     },
     headerSurface: {
-        borderRadius: 28,
-        backgroundColor: '#F6E6D8',
-        padding: 24,
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 8,
-        },
-        shadowOpacity: 0.15,
-        shadowRadius: 24,
-        elevation: 12,
+        borderRadius: borderRadius.xl,
+        backgroundColor: colors.card,
+        padding: spacing.lg,
     },
     headerContent: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
     },
-    greeting: {
-        fontSize: 14,
-        fontFamily: 'System',
-        fontWeight: '500',
-        color: '#F08A5D',
-        marginBottom: 4,
-        letterSpacing: 0.5,
-    },
     title: {
         fontSize: 28,
-        fontFamily: 'System',
         fontWeight: '700',
-        color: '#2E1A47',
+        color: colors.text,
         letterSpacing: -1,
         lineHeight: 32,
     },
     createButton: {
         borderRadius: 20,
-        shadowColor: '#F08A5D',
+        shadowColor: colors.coral,
         shadowOffset: {
             width: 0,
             height: 6,
@@ -188,23 +172,23 @@ const styles = StyleSheet.create({
         width: 48,
         height: 48,
         borderRadius: 24,
-        backgroundColor: '#F08A5D',
+        backgroundColor: colors.coral,
         alignItems: 'center',
         justifyContent: 'center',
     },
     createButtonIcon: {
         fontSize: 24,
         fontWeight: '300',
-        color: '#FFFFFF',
+        color: colors.white,
         lineHeight: 28,
     },
     contentContainer: {
         flex: 1,
-        backgroundColor: '#3A235A',
-        paddingHorizontal: 24,
-        paddingTop: 24,
-        borderTopLeftRadius: 32,
-        borderTopRightRadius: 32,
+        backgroundColor: colors.primary, // Using primary for the content background behind cards
+        paddingHorizontal: spacing.lg,
+        paddingTop: spacing.lg,
+        borderTopLeftRadius: borderRadius.xl,
+        borderTopRightRadius: borderRadius.xl,
         marginTop: -16,
     },
     centerContent: {
@@ -214,42 +198,28 @@ const styles = StyleSheet.create({
         paddingBottom: 100,
     },
     loadingText: {
-        marginTop: 20,
+        marginTop: spacing.md,
         fontSize: 16,
-        fontFamily: 'System',
         fontWeight: '500',
-        color: '#B8A1D9',
+        color: colors.lilac,
         textAlign: 'center',
         letterSpacing: 0.2,
     },
     errorCard: {
-        borderRadius: 24,
-        backgroundColor: '#F6E6D8',
-        padding: 32,
+        borderRadius: borderRadius.lg,
+        backgroundColor: colors.card,
+        padding: spacing.xl,
         alignItems: 'center',
-        marginHorizontal: 16,
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 6,
-        },
-        shadowOpacity: 0.1,
-        shadowRadius: 20,
-        elevation: 8,
+        marginHorizontal: spacing.md,
+        ...shadows.soft,
     },
     errorTitle: {
-        fontSize: 20,
-        fontFamily: 'System',
-        fontWeight: '600',
-        color: '#F08A5D',
-        marginBottom: 12,
-        letterSpacing: -0.5,
+        ...typography.titleMedium,
+        color: colors.coral,
+        marginBottom: spacing.sm,
     },
     errorDetail: {
-        fontSize: 15,
-        fontFamily: 'System',
-        fontWeight: '400',
-        color: '#2E1A47',
+        ...typography.bodyMedium,
         textAlign: 'center',
         lineHeight: 22,
         letterSpacing: 0.1,
@@ -269,29 +239,21 @@ const styles = StyleSheet.create({
         letterSpacing: 0.3,
     },
     emptyCard: {
-        borderRadius: 28,
-        backgroundColor: '#F6E6D8',
+        borderRadius: borderRadius.xl,
+        backgroundColor: colors.card,
         padding: 40,
         alignItems: 'center',
-        marginHorizontal: 16,
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 8,
-        },
-        shadowOpacity: 0.12,
-        shadowRadius: 24,
-        elevation: 12,
+        marginHorizontal: spacing.md,
     },
     emptyIconContainer: {
         width: 80,
         height: 80,
         borderRadius: 40,
-        backgroundColor: '#F6D186',
+        backgroundColor: colors.yellow,
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 24,
-        shadowColor: '#F6D186',
+        marginBottom: spacing.lg,
+        shadowColor: colors.yellow,
         shadowOffset: {
             width: 0,
             height: 4,
@@ -304,31 +266,22 @@ const styles = StyleSheet.create({
         fontSize: 40,
     },
     emptyTitle: {
-        fontSize: 22,
-        fontFamily: 'System',
-        fontWeight: '600',
-        color: '#2E1A47',
-        marginBottom: 12,
-        letterSpacing: -0.5,
+        ...typography.titleLarge,
+        marginBottom: spacing.sm,
         textAlign: 'center',
     },
     emptyDetail: {
-        fontSize: 15,
-        fontFamily: 'System',
-        fontWeight: '400',
-        color: '#2E1A47',
+        ...typography.bodyMedium,
         textAlign: 'center',
-        lineHeight: 22,
-        marginBottom: 28,
-        letterSpacing: 0.1,
-        paddingHorizontal: 8,
+        marginBottom: spacing.xl,
+        paddingHorizontal: spacing.sm,
     },
     emptyButton: {
         borderRadius: 20,
-        backgroundColor: '#B8A1D9',
+        backgroundColor: colors.lilac,
         paddingHorizontal: 28,
         paddingVertical: 14,
-        shadowColor: '#B8A1D9',
+        shadowColor: colors.lilac,
         shadowOffset: {
             width: 0,
             height: 4,
@@ -339,16 +292,15 @@ const styles = StyleSheet.create({
     },
     emptyButtonText: {
         fontSize: 16,
-        fontFamily: 'System',
         fontWeight: '600',
-        color: '#FFFFFF',
+        color: colors.white,
         letterSpacing: 0.5,
     },
     listContent: {
         paddingBottom: 40,
-        paddingHorizontal: 8,
+        paddingHorizontal: spacing.xs,
     },
     cardWrapper: {
-        marginBottom: 20,
+        marginBottom: spacing.md,
     },
 });

@@ -68,6 +68,31 @@ export type {
 } from './api';
 
 // ============================================
+// Comment Types
+// ============================================
+
+export type Comment = {
+  id: number;
+  content: string;
+  authorId: number;
+  targetId: number; // postId or locationId
+  targetType: 'post' | 'location';
+  createdAt: string;
+  author?: {
+      firstName: string;
+      lastName: string;
+      profilePictureUrl?: string;
+  }
+};
+
+export type NewComment = {
+  content: string;
+  targetId: number;
+  targetType: 'post' | 'location';
+  authorId: number;
+};
+
+// ============================================
 // User Types (aligned with backend UserResponse)
 // ============================================
 
@@ -100,6 +125,8 @@ export type Group = {
   coverPictureUrl: string | null;
   createdAt: string | null;
   isPublic: boolean;
+  description?: string;
+  memberCount?: number;
 };
 
 export type NewGroup = {

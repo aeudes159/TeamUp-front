@@ -5,15 +5,16 @@
  * Uses ListWrapper for loading/empty states, reducing code by ~50%.
  */
 
-import { FlatList, StyleSheet } from 'react-native';
-import { MapPin } from 'lucide-react-native';
-import { LocationCard } from './LocationCard';
-import { ListWrapper } from '@/components/ui/StateComponents';
-import type { Location } from '@/types';
+import {FlatList, StyleSheet, View} from 'react-native';
+import {ActivityIndicator, Surface, Text, useTheme} from 'react-native-paper';
+import {LocationCard} from './LocationCard';
+import type {Location} from '@/types';
 
 type LocationListProps = {
     locations: Location[];
     onLocationPress?: (location: Location) => void;
+    onEditLocation?: (location: Location) => void;
+    onDeleteLocation?: (location: Location) => void;
     isLoading?: boolean;
     error?: Error | null;
     onRetry?: () => void;
@@ -22,39 +23,94 @@ type LocationListProps = {
 export function LocationList({
     locations,
     onLocationPress,
+    onEditLocation,
+    onDeleteLocation,
     isLoading = false,
-    error = null,
-    onRetry,
 }: Readonly<LocationListProps>) {
+    const { colors } = useTheme();
+
+    if (isLoading) {
+        return (
+            <View style={styles.centerContent}>
+                <ActivityIndicator size="large" color={colors.secondary} />
+                <Text style={[styles.messageText, { color: colors.onSurfaceVariant }]}>
+                    Chargement des lieux...
+                </Text>
+            </View>
+        );
+    }
+
+    if (locations.length === 0) {
+        return (
+            <View style={styles.centerContent}>
+                <Surface style={[styles.emptyCard, { backgroundColor: colors.surface }]}>
+                    <Text style={styles.emptyIcon}>📍</Text>
+                    <Text style={[styles.emptyTitle, { color: colors.onSurface }]}>Aucun lieu trouvé</Text>
+                    <Text style={[styles.emptyDetail, { color: colors.onSurfaceVariant }]}>
+                        Créez un nouveau lieu pour commencer.
+                    </Text>
+                </Surface>
+            </View>
+        );
+    }
+
     return (
-        <ListWrapper
-            isLoading={isLoading}
-            error={error}
-            isEmpty={locations.length === 0}
-            loadingMessage="Chargement des lieux..."
-            emptyTitle="Aucun lieu disponible"
-            emptySubtitle="Ajoutez un nouveau lieu pour commencer"
-            emptyIcon={<MapPin size={48} color="#d1d5db" />}
-            onRetry={onRetry}
-        >
-            <FlatList
-                data={locations}
-                keyExtractor={(item) => String(item.id)}
-                renderItem={({ item }) => (
-                    <LocationCard
-                        location={item}
-                        onPress={() => onLocationPress?.(item)}
-                    />
-                )}
-                contentContainerStyle={styles.listContent}
-            />
-        </ListWrapper>
+        <FlatList
+            data={locations}
+            keyExtractor={(item) => String(item.id)}
+            renderItem={({ item }) => (
+                <LocationCard
+                    location={item}
+                    onPress={() => onLocationPress?.(item)}
+                    onEdit={onEditLocation ? () => onEditLocation(item) : undefined}
+                    onDelete={onDeleteLocation ? () => onDeleteLocation(item) : undefined}
+                />
+            )}
+            contentContainerStyle={styles.listContent}
+            showsVerticalScrollIndicator={false}
+        />
     );
 }
 
 const styles = StyleSheet.create({
+    centerContent: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 24,
+    },
+    messageText: {
+        marginTop: 20,
+        fontSize: 16,
+    },
+    emptyCard: {
+        borderRadius: 28,
+        padding: 40,
+        alignItems: 'center',
+        marginHorizontal: 16,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.1,
+        shadowRadius: 24,
+        elevation: 12,
+    },
+    emptyIcon: {
+        fontSize: 48,
+        marginBottom: 24,
+    },
+    emptyTitle: {
+        fontSize: 22,
+        fontWeight: '600',
+        marginBottom: 12,
+        textAlign: 'center',
+    },
+    emptyDetail: {
+        fontSize: 15,
+        textAlign: 'center',
+        lineHeight: 22,
+    },
     listContent: {
-        paddingHorizontal: 16,
-        paddingBottom: 16,
+        paddingVertical: 16,
+        paddingBottom: 80, // for FAB
     },
 });

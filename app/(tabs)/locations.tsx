@@ -1,233 +1,311 @@
-import { View, StyleSheet } from 'react-native';
+import { useState, useEffect } from 'react';
+import { View, StyleSheet, Alert, Animated, TouchableOpacity, Platform } from 'react-native';
 import { Screen } from '@/components/layout/Screen';
-import { Appbar, Menu, Button, Searchbar, Text } from 'react-native-paper';
+import { Button, Searchbar, Text, FAB, Surface, useTheme, IconButton, Menu, Divider } from 'react-native-paper';
 import { LocationList } from '@/components/location/LocationList';
-import { useLocations } from '@/hooks/useLocations';
-import type { Location } from '@/types';
-import { useState } from 'react';
+import { CreateLocationModal } from '@/components/location/CreateLocationModal';
+import { EditLocationModal } from '@/components/location/EditLocationModal';
+import { LocationDetailsModal } from '@/components/location/LocationDetailsModal';
+import { useLocations, useCreateLocation, useUpdateLocation, useDeleteLocation } from '@/hooks/useLocations';
+import type { Location, NewLocation } from '@/types';
 import { LocationSort } from '@/types/api';
+import { colors, shadows, borderRadius, spacing, typography } from '@/constants/theme';
+import { Filter, ChevronDown, Check } from 'lucide-react-native';
 
-export default function EventsScreen() {
+const CURRENT_USER_ID = 1; // Mock user ID
+
+export default function LocationsScreen() {
+    const theme = useTheme();
     const [search, setSearch] = useState('');
-    const [minPrice, setMinPrice] = useState<number | undefined>(undefined);
-    const [maxPrice, setMaxPrice] = useState<number | undefined>(undefined);
+    const [debouncedSearch, setDebouncedSearch] = useState('');
     const [sort, setSort] = useState<LocationSort>('NAME');
     const [sortMenuVisible, setSortMenuVisible] = useState(false);
+    const [showCreateModal, setShowCreateModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [showDetailsModal, setShowDetailsModal] = useState(false);
+    const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
+    const [scrollY] = useState(new Animated.Value(0));
+
+    // Debounce search input
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearch(search);
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [search]);
+
+    const headerOpacity = scrollY.interpolate({
+        inputRange: [0, 100],
+        outputRange: [1, 0.9],
+        extrapolate: 'clamp',
+    });
+
+    const headerTranslateY = scrollY.interpolate({
+        inputRange: [0, 100],
+        outputRange: [0, -10],
+        extrapolate: 'clamp',
+    });
 
     const { data, isLoading, error } = useLocations({
         page: 0,
         size: 20,
-        name: search || undefined,
-        minPrice,
-        maxPrice,
+        name: debouncedSearch || undefined,
         sort,
     });
 
+    const createLocation = useCreateLocation();
+    const updateLocation = useUpdateLocation();
+    const deleteLocation = useDeleteLocation();
+
     const handleLocationPress = (location: Location) => {
-        console.log('Location clicked:', location.id);
+        setSelectedLocation(location);
+        setShowDetailsModal(true);
     };
 
-    const getPriceLabel = () => {
-        if (minPrice === undefined && maxPrice === undefined) return 'Tous les prix';
-        if (minPrice !== undefined && maxPrice !== undefined) return `${minPrice}€ - ${maxPrice}€`;
-        if (minPrice !== undefined) return `≥ ${minPrice}€`;
-        if (maxPrice !== undefined) return `≤ ${maxPrice}€`;
-        return 'Tous les prix';
+    const handleCreateLocation = (newLocation: NewLocation) => {
+        createLocation.mutate(newLocation, {
+            onSuccess: () => {
+                setShowCreateModal(false);
+            },
+            onError: (err) => {
+                Alert.alert('Erreur', 'Impossible de créer le lieu. Veuillez réessayer.');
+                console.error('Create location error:', err);
+            },
+        });
+    };
+
+    const handleEditLocation = (location: Location) => {
+        setSelectedLocation(location);
+        setShowEditModal(true);
+    };
+
+    const handleUpdateLocation = (locationId: number, updates: Partial<NewLocation>) => {
+        updateLocation.mutate(
+            { id: locationId, ...updates },
+            {
+                onSuccess: () => {
+                    setShowEditModal(false);
+                    setSelectedLocation(null);
+                },
+                onError: (err) => {
+                    Alert.alert('Erreur', 'Impossible de modifier le lieu. Veuillez réessayer.');
+                    console.error('Update location error:', err);
+                },
+            }
+        );
+    };
+
+    const handleDeleteLocation = (location: Location) => {
+        if (Platform.OS === 'web') {
+            const confirmed = window.confirm(`Êtes-vous sûr de vouloir supprimer "${location.name || 'ce lieu'}" ?`);
+            if (confirmed && location.id) {
+                deleteLocation.mutate(location.id, {
+                    onError: (err) => {
+                        console.error('Delete location error:', err);
+                        alert('Impossible de supprimer le lieu. Veuillez réessayer.');
+                    },
+                });
+            }
+        } else {
+            Alert.alert(
+                'Supprimer le lieu',
+                `Êtes-vous sûr de vouloir supprimer "${location.name || 'ce lieu'}" ?`,
+                [
+                    { text: 'Annuler', style: 'cancel' },
+                    {
+                        text: 'Supprimer',
+                        style: 'destructive',
+                        onPress: () => {
+                            if (location.id) {
+                                deleteLocation.mutate(location.id, {
+                                    onError: (err) => {
+                                        Alert.alert('Erreur', 'Impossible de supprimer le lieu. Veuillez réessayer.');
+                                        console.error('Delete location error:', err);
+                                    },
+                                });
+                            }
+                        },
+                    },
+                ]
+            );
+        }
+    };
+
+    const openSortMenu = () => setSortMenuVisible(true);
+    const closeSortMenu = () => setSortMenuVisible(false);
+
+    const handleSortChange = (newSort: LocationSort) => {
+        setSort(newSort);
+        closeSortMenu();
     };
 
     return (
-        <Screen scrollable={false}>
-            <Appbar.Header>
-                <Appbar.Content title="Événements" />
-                <Appbar.Action icon="plus" onPress={() => {}} />
-            </Appbar.Header>
-
-            <View style={styles.filtersContainer}>
-                <View style={styles.topRow}>
-                    <Searchbar
-                        placeholder="Rechercher un lieu"
-                        value={search}
-                        onChangeText={setSearch}
-                        style={styles.searchbar}
-                        inputStyle={styles.searchbarInput}
-                        iconColor="#6b7280"
-                    />
-
-                    <Menu
-                        visible={sortMenuVisible}
-                        onDismiss={() => setSortMenuVisible(false)}
-                        anchor={
-                            <Button
-                                mode="outlined"
-                                compact
-                                onPress={() => setSortMenuVisible(true)}
-                                style={styles.sortButton}
-                                contentStyle={styles.sortButtonContent}
-                                labelStyle={styles.sortButtonLabel}
-                            >
-                                {`Trier : ${sort === 'POPULARITY' ? 'Popularité' : 'Nom'}`}
-                            </Button>
-                        }
-                    >
-                        <Menu.Item
-                            onPress={() => {
-                                setSort('NAME');
-                                setSortMenuVisible(false);
-                            }}
-                            title="Nom"
+        <Screen scrollable={false} style={{ backgroundColor: colors.background }}>
+            <Animated.View 
+                style={[
+                    styles.headerContainer, 
+                    { 
+                        opacity: headerOpacity,
+                        transform: [{ translateY: headerTranslateY }]
+                    }
+                ]}
+            >
+                <Surface style={[styles.headerSurface, shadows.soft]} elevation={0}>
+                    <Text style={[styles.title, { color: colors.text }]}>Activités</Text>
+                    
+                    <View style={styles.searchContainer}>
+                        <Searchbar
+                            placeholder="Rechercher une activité..."
+                            onChangeText={setSearch}
+                            value={search}
+                            style={styles.searchBar}
+                            inputStyle={styles.searchInput}
+                            iconColor={colors.textSecondary}
+                            placeholderTextColor={colors.textSecondary}
+                            elevation={0}
                         />
-                        <Menu.Item
-                            onPress={() => {
-                                setSort('POPULARITY');
-                                setSortMenuVisible(false);
-                            }}
-                            title="Popularité"
-                        />
-                    </Menu>
-                </View>
-
-                <View style={styles.priceFiltersRow}>
-                    <Text style={styles.priceFilterLabel}>Échelle de prix :</Text>
-
-                    <Button
-                        mode={minPrice === undefined && maxPrice === undefined ? 'contained' : 'outlined'}
-                        onPress={() => {
-                            setMinPrice(undefined);
-                            setMaxPrice(undefined);
-                        }}
-                        style={styles.priceButton}
-                    >
-                        Tous les prix
-                    </Button>
-
-                    <Button
-                        mode={minPrice === 0 && maxPrice === 10 ? 'contained' : 'outlined'}
-                        onPress={() => {
-                            setMinPrice(0);
-                            setMaxPrice(10);
-                        }}
-                        style={styles.priceButton}
-                    >
-                        0€ - 10€
-                    </Button>
-
-                    <Button
-                        mode={minPrice === 10 && maxPrice === 25 ? 'contained' : 'outlined'}
-                        onPress={() => {
-                            setMinPrice(10);
-                            setMaxPrice(25);
-                        }}
-                        style={styles.priceButton}
-                    >
-                        10€ - 25€
-                    </Button>
-
-                    <Button
-                        mode={minPrice === 25 && maxPrice === 50 ? 'contained' : 'outlined'}
-                        onPress={() => {
-                            setMinPrice(25);
-                            setMaxPrice(50);
-                        }}
-                        style={styles.priceButton}
-                    >
-                        25€ - 50€
-                    </Button>
-
-                    <Button
-                        mode={minPrice === 50 && maxPrice === 100 ? 'contained' : 'outlined'}
-                        onPress={() => {
-                            setMinPrice(50);
-                            setMaxPrice(100);
-                        }}
-                        style={styles.priceButton}
-                    >
-                        50€ - 100€
-                    </Button>
-                </View>
-            </View>
-
-            <View style={styles.container}>
-                {error && (
-                    <View style={styles.errorContainer}>
-                        <Text variant="bodyMedium" style={styles.errorText}>
-                            Erreur de chargement: {error.message}
-                        </Text>
+                        
+                        <Menu
+                            visible={sortMenuVisible}
+                            onDismiss={closeSortMenu}
+                            anchor={
+                                <TouchableOpacity onPress={openSortMenu} style={styles.sortButton} activeOpacity={0.7}>
+                                    <Filter size={20} color={colors.primary} />
+                                </TouchableOpacity>
+                            }
+                            contentStyle={styles.menuContent}
+                        >
+                            <Menu.Item 
+                                onPress={() => handleSortChange('NAME')} 
+                                title="Nom (A-Z)" 
+                                leadingIcon={() => sort === 'NAME' ? <Check size={18} color={colors.primary} /> : null}
+                                titleStyle={sort === 'NAME' ? styles.activeMenuItem : styles.menuItem}
+                            />
+                            <Divider />
+                            <Menu.Item 
+                                onPress={() => handleSortChange('POPULARITY')} 
+                                title="Popularité" 
+                                leadingIcon={() => sort === 'POPULARITY' ? <Check size={18} color={colors.primary} /> : null}
+                                titleStyle={sort === 'POPULARITY' ? styles.activeMenuItem : styles.menuItem}
+                            />
+                        </Menu>
                     </View>
-                )}
+                </Surface>
+            </Animated.View>
 
+            <View style={styles.contentContainer}>
                 <LocationList
-                    locations={data?.data ?? []}
+                    locations={data ?? []}
                     isLoading={isLoading}
                     onLocationPress={handleLocationPress}
+                    onEditLocation={handleEditLocation}
+                    onDeleteLocation={handleDeleteLocation}
+                    onScroll={Animated.event(
+                        [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+                        { useNativeDriver: false }
+                    )}
                 />
             </View>
+
+            <FAB
+                icon="plus"
+                style={[styles.fab, { backgroundColor: colors.primary }]}
+                onPress={() => setShowCreateModal(true)}
+                color={colors.white}
+            />
+
+            <CreateLocationModal
+                visible={showCreateModal}
+                onClose={() => setShowCreateModal(false)}
+                onCreateLocation={handleCreateLocation}
+                isLoading={createLocation.isPending}
+            />
+            <EditLocationModal
+                visible={showEditModal}
+                onClose={() => { setShowEditModal(false); setSelectedLocation(null); }}
+                onUpdateLocation={handleUpdateLocation}
+                isLoading={updateLocation.isPending}
+                location={selectedLocation}
+            />
+            <LocationDetailsModal
+                visible={showDetailsModal}
+                onClose={() => { setShowDetailsModal(false); setSelectedLocation(null); }}
+                location={selectedLocation}
+                currentUserId={CURRENT_USER_ID}
+            />
         </Screen>
     );
 }
 
 const styles = StyleSheet.create({
-    filtersContainer: {
-        paddingHorizontal: 12,
-        paddingVertical: 8,
-        gap: 12,
+    headerContainer: {
+        paddingTop: 16,
+        paddingHorizontal: spacing.lg,
+        paddingBottom: 8,
+        zIndex: 10,
     },
-    topRow: {
+    headerSurface: {
+        borderRadius: borderRadius.lg,
+        backgroundColor: colors.card,
+        padding: spacing.md,
+        paddingBottom: spacing.md,
+    },
+    title: {
+        fontSize: 20,
+        fontWeight: '700',
+        letterSpacing: -0.5,
+        color: colors.text,
+        marginBottom: spacing.sm,
+        textAlign: 'center',
+    },
+    searchContainer: {
         flexDirection: 'row',
-        flexWrap: 'wrap',
         alignItems: 'center',
-        gap: 8,
+        gap: spacing.sm,
     },
-    searchbar: {
+    searchBar: {
         flex: 1,
-        minWidth: 150,
-        maxWidth: 300,
-        borderRadius: 12,
-        height: 40,
+        backgroundColor: colors.white,
+        borderRadius: borderRadius.lg,
+        height: 46,
     },
-    searchbarInput: {
-        paddingVertical: 6,
-        fontSize: 14,
+    searchInput: {
+        ...typography.bodyMedium,
+        minHeight: 0, 
     },
     sortButton: {
-        borderRadius: 12,
-        height: 40,
-        justifyContent: 'center',
-        minWidth: 130,
-    },
-    sortButtonContent: {
-        paddingHorizontal: 8,
-    },
-    sortButtonLabel: {
-        fontSize: 13,
-    },
-    priceFiltersRow: {
-        flexDirection: 'row',
-        gap: 8,
-        flexWrap: 'wrap',
+        width: 46,
+        height: 46,
+        borderRadius: borderRadius.lg,
+        backgroundColor: colors.white,
         alignItems: 'center',
-    },
-    priceFilterLabel: {
-        fontSize: 16,
-        marginRight: 8,
-        alignSelf: 'center',
-    },
-    priceButton: {
-        borderRadius: 12,
-        minWidth: 80,
-        height: 36,
         justifyContent: 'center',
+        borderWidth: 1,
+        borderColor: colors.cardLight,
     },
-    container: {
+    menuContent: {
+        backgroundColor: colors.white,
+        borderRadius: borderRadius.lg,
+        marginTop: 4,
+        ...shadows.soft,
+    },
+    menuItem: {
+        color: colors.text,
+    },
+    activeMenuItem: {
+        color: colors.primary,
+        fontWeight: '600',
+    },
+    contentContainer: {
         flex: 1,
+        backgroundColor: colors.background,
+        marginTop: -10, // Slight overlap for smooth look
+        paddingTop: 10,
     },
-    errorContainer: {
-        padding: 16,
-        backgroundColor: '#fee2e2',
-        margin: 16,
-        borderRadius: 8,
-    },
-    errorText: {
-        color: '#dc2626',
-        textAlign: 'center',
+    fab: {
+        position: 'absolute',
+        right: spacing.lg,
+        bottom: spacing.lg,
+        borderRadius: borderRadius.xl,
     },
 });

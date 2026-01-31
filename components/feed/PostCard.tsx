@@ -1,114 +1,211 @@
-import { View, StyleSheet } from 'react-native';
-import { Image } from 'expo-image';
-import { Card, Text, Avatar } from 'react-native-paper';
-import { MapPin, Clock } from 'lucide-react-native';
-import { formatDate, getFullName } from '@/lib/utils';
-import type { Post, User, Location, PostCardProps } from '@/types';
+import {TouchableOpacity, View} from 'react-native';
+import {Avatar, Surface, Text} from 'react-native-paper';
+import type {Location, Post, User} from '@/types';
+import {borderRadius, shadows, typography} from "@/constants/theme";
+import {Clock, MapPin, MessageCircle, Pencil, Trash2} from "lucide-react-native";
+import colors = module
+
+type PostCardProps = {
+    post: Post;
+    author?: User;
+    location?: Location;
+    commentCount?: number;
+    currentUserId?: number;
+    onPress?: () => void;
+    onCommentPress?: () => void;
+    onEditPress?: () => void;
+    onDeletePress?: () => void;
+};
 
 export function PostCard({
     post,
     author,
     location,
+    commentCount = 0,
+    currentUserId,
     onPress,
+    onCommentPress,
+    onEditPress,
+    onDeletePress,
 }: Readonly<PostCardProps>) {
+    const isAuthor = currentUserId !== undefined && post.authorId === currentUserId;
+
+    const formatDate = (dateString: string | null) => {
+        if (!dateString) return 'Unknown date';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('fr-FR', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+        });
+    };
+
+    const getAuthorName = () => {
+        if (author) {
+            return `${author.firstName ?? ''} ${author.lastName ?? ''}`.trim() || 'Utilisateur';
+        }
+        return 'Utilisateur Inconnu';
+    };
+
     const getAuthorAvatar = () => {
-        return author?.profilePictureUrl ?? 'https://i.pravatar.cc/150?img=1';
+        return author?.profilePictureUrl ?? `https://i.pravatar.cc/150?u=${post.authorId}`;
     };
 
     return (
-        <Card style={styles.card} onPress={onPress}>
-            {/* Author Header */}
-            <View style={styles.authorRow}>
-                <Avatar.Image 
-                    size={40} 
-                    source={{ uri: getAuthorAvatar() }} 
-                />
-                <View style={styles.authorInfo}>
-                    <Text variant="titleSmall" style={styles.authorName}>
-                        {getFullName(author?.firstName, author?.lastName)}
-                    </Text>
-                    <View style={styles.dateRow}>
-                        <Clock size={12} color="#6b7280" />
-                        <Text variant="bodySmall" style={styles.dateText}>
-                            {formatDate(post.postedAt)}
+        <Surface style={[styles.card, shadows.soft]} elevation={0}>
+            <TouchableOpacity onPress={onPress} activeOpacity={0.9}>
+                {/* Author Header */}
+                <View style={styles.authorRow}>
+                    <Avatar.Image 
+                        size={48} 
+                        source={{ uri: getAuthorAvatar() }} 
+                        style={{ backgroundColor: colors.cardLight }}
+                    />
+                    <View style={styles.authorInfo}>
+                        <Text style={[typography.titleMedium, { color: colors.text }]}>
+                            {getAuthorName()}
                         </Text>
+                        <View style={styles.dateRow}>
+                            <Clock size={14} color={colors.textSecondary} />
+                            <Text style={[typography.bodySmall, { color: colors.textSecondary }]}>
+                                {formatDate(post.postedAt)}
+                            </Text>
+                        </View>
                     </View>
                 </View>
-            </View>
 
-            {/* Post Image */}
-            {post.imageUrl && (
-                <Card.Cover source={{ uri: post.imageUrl }} style={styles.cover} />
-            )}
-
-            {/* Post Content */}
-            <Card.Content style={styles.content}>
-                {post.content && (
-                    <Text variant="bodyMedium" style={styles.postContent}>
-                        {post.content}
-                    </Text>
-                )}
-
-                {/* Location */}
-                {location && (
-                    <View style={styles.locationRow}>
-                        <MapPin size={14} color="#6366f1" />
-                        <Text variant="bodySmall" style={styles.locationText}>
-                            {location.name ?? location.address}
+                {/* Post Content */}
+                <View style={styles.content}>
+                    {post.content && (
+                        <Text style={[typography.bodyLarge, styles.postContent]}>
+                            {post.content}
                         </Text>
-                    </View>
+                    )}
+                </View>
+                
+                {/* Post Image */}
+                {post.imageUrl && (
+                    <Image source={{ uri: post.imageUrl }} style={styles.cover} contentFit="cover" />
                 )}
-            </Card.Content>
-        </Card>
+
+                {/* Footer */}
+                <View style={styles.footer}>
+                    {/* Location */}
+                    {location && (
+                        <View style={styles.locationRow}>
+                            <MapPin size={16} color={colors.primary} />
+                            <Text style={[typography.bodyMedium, styles.locationText]}>
+                                {location.name ?? location.address}
+                            </Text>
+                        </View>
+                    )}
+
+                    {/* Actions Row */}
+                    <View style={styles.actionsRow}>
+                        <TouchableOpacity 
+                            style={styles.commentButton}
+                            onPress={onCommentPress}
+                        >
+                            <MessageCircle size={20} color={colors.textSecondary} />
+                            <Text style={[typography.bodyMedium, styles.commentCount]}>
+                                {commentCount}
+                            </Text>
+                        </TouchableOpacity>
+
+                        {isAuthor && (
+                            <View style={styles.authorActions}>
+                                <TouchableOpacity 
+                                    style={styles.actionIconButton}
+                                    onPress={onEditPress}
+                                >
+                                    <Pencil size={18} color={colors.primary} />
+                                </TouchableOpacity>
+                                <TouchableOpacity 
+                                    style={styles.actionIconButton}
+                                    onPress={onDeletePress}
+                                >
+                                    <Trash2 size={18} color={colors.coral} />
+                                </TouchableOpacity>
+                            </View>
+                        )}
+                    </View>
+                </View>
+            </TouchableOpacity>
+        </Surface>
     );
 }
 
 const styles = StyleSheet.create({
     card: {
-        marginBottom: 16,
-        borderRadius: 12,
+        marginBottom: 24,
+        borderRadius: borderRadius.lg,
+        backgroundColor: colors.card,
+        overflow: 'hidden',
     },
     authorRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        padding: 12,
-        paddingBottom: 8,
+        padding: 16,
     },
     authorInfo: {
         marginLeft: 12,
         flex: 1,
     },
-    authorName: {
-        fontWeight: '600',
-    },
     dateRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 4,
-        marginTop: 2,
-    },
-    dateText: {
-        color: '#6b7280',
-        fontSize: 12,
-    },
-    cover: {
-        height: 200,
-        marginHorizontal: 0,
+        gap: 6,
+        marginTop: 4,
     },
     content: {
-        paddingTop: 12,
+        paddingHorizontal: 20,
+        paddingBottom: 16,
     },
     postContent: {
-        marginBottom: 12,
-        lineHeight: 22,
+        color: colors.text,
+    },
+    cover: {
+        height: 220,
+        backgroundColor: colors.cardLight,
+    },
+    footer: {
+        padding: 20,
+        paddingTop: 16,
     },
     locationRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 6,
+        gap: 8,
+        marginBottom: 16,
     },
     locationText: {
-        color: '#6366f1',
+        color: colors.primary,
+        fontWeight: '600',
         flex: 1,
+    },
+    actionsRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingTop: 12,
+        borderTopWidth: 1,
+        borderColor: colors.cardLight,
+    },
+    commentButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+    },
+    commentCount: {
+        color: colors.textSecondary,
+        fontWeight: '600',
+    },
+    authorActions: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+    },
+    actionIconButton: {
+        padding: 8,
     },
 });
