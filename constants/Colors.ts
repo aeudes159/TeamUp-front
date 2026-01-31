@@ -1,19 +1,31 @@
-const tintColorLight = '#2f95dc';
-const tintColorDark = '#fff';
+// Palette moderne et chaleureuse
+const violetPrune = '#3A235A';
+const violetPruneDark = '#2E1A47';
+const beigeCreme = '#F6E6D8';
+const beigeCremeLight = '#F3D1C8';
+const corailDoux = '#F08A5D';
+const lilas = '#B8A1D9';
+const jaunePastel = '#F6D186';
 
 export default {
   light: {
-    text: '#000',
-    background: '#fff',
-    tint: tintColorLight,
-    tabIconDefault: '#ccc',
-    tabIconSelected: tintColorLight,
+    text: violetPruneDark,
+    background: beigeCreme,
+    tint: corailDoux,
+    tabIconDefault: '#8A7A9F',
+    tabIconSelected: corailDoux,
+    card: beigeCremeLight,
+    accent: lilas,
+    highlight: jaunePastel,
   },
   dark: {
-    text: '#fff',
-    background: '#000',
-    tint: tintColorDark,
-    tabIconDefault: '#ccc',
-    tabIconSelected: tintColorDark,
+    text: beigeCreme,
+    background: violetPruneDark,
+    tint: corailDoux,
+    tabIconDefault: '#6B5B7F',
+    tabIconSelected: corailDoux,
+    card: violetPrune,
+    accent: lilas,
+    highlight: jaunePastel,
   },
 };
